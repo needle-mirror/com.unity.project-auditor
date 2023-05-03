@@ -1,0 +1,15 @@
+{
+    "name": "Unity.ProjectAuditor.Editor.Utils",
+    "references": [
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "noEngineReferences": false
+}

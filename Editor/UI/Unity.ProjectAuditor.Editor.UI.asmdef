@@ -1,0 +1,25 @@
+{
+    "name": "Unity.ProjectAuditor.Editor.UI",
+    "references": [
+        "Unity.ProjectAuditor.Editor",
+        "Unity.ProjectAuditor.Editor.UI.Framework",
+        "Unity.ProjectAuditor.Editor.Utils"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.build-report-inspector",
+            "expression": "",
+            "define": "PACKAGE_BUILD_REPORT_INSPECTOR"
+        }
+    ],
+    "noEngineReferences": false
+}
