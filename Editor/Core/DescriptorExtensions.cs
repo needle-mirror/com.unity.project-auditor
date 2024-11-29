@@ -60,6 +60,12 @@ namespace Unity.ProjectAuditor.Editor.Core
             foreach (var buildTarget in platforms)
             {
                 var buildTargetGroup = BuildPipeline.GetBuildTargetGroup(buildTarget);
+
+#if UNITY_EDITOR_OSX
+                if (buildTarget == BuildTarget.StandaloneOSX)
+                    return true;
+#endif
+
                 if (BuildPipeline.IsBuildTargetSupported(buildTargetGroup, buildTarget))
                     return true;
             }
