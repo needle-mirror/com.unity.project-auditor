@@ -117,6 +117,7 @@ namespace Unity.ProjectAuditor.Editor.Tests.Common
                 CodeOptimization = m_CodeOptimization,
                 OnIncomingIssues = foundIssues.AddRange,
                 Platform = m_Platform,
+                SupportedBuildTarget = (group, target) => { return true; },
                 AssetPathFilter = filterPredicate
             };
             m_ProjectAuditor.Audit(projectAuditorParams);
@@ -143,6 +144,7 @@ namespace Unity.ProjectAuditor.Editor.Tests.Common
                     foundIssues.AddRange(categoryIssues);
                 },
                 Platform = m_Platform,
+                SupportedBuildTarget = (group, target) => { return true; },
                 AssetPathFilter = filterPredicate
             };
 
@@ -185,6 +187,7 @@ namespace Unity.ProjectAuditor.Editor.Tests.Common
 
                     foundIssues.AddRange(predicate == null ? categoryIssues : categoryIssues.Where(predicate));
                 },
+                SupportedBuildTarget = (group, target) => { return true; },
                 Platform = m_Platform
             }.WithAdditionalDiagnosticRules(m_AdditionalRules);
 
