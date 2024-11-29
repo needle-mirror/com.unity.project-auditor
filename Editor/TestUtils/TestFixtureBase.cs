@@ -153,8 +153,6 @@ namespace Unity.ProjectAuditor.Editor.Tests.Common
 
         protected ReportItem[] Analyze(Func<ReportItem, bool> predicate = null)
         {
-            ValidateTargetPlatform();
-
             var foundIssues = new List<ReportItem>();
 
             m_AnalysisParams = new AnalysisParams
@@ -164,6 +162,7 @@ namespace Unity.ProjectAuditor.Editor.Tests.Common
                 {
                     foundIssues.AddRange(predicate == null ? issues : issues.Where(predicate));
                 },
+                SupportedBuildTarget = (group, target) => { return true; },
                 Platform = m_Platform
             }.WithAdditionalDiagnosticRules(m_AdditionalRules);
 
@@ -174,8 +173,6 @@ namespace Unity.ProjectAuditor.Editor.Tests.Common
 
         protected ReportItem[] Analyze(IssueCategory category, Func<ReportItem, bool> predicate = null)
         {
-            ValidateTargetPlatform();
-
             var foundIssues = new List<ReportItem>();
             var projectAuditor = new ProjectAuditor();
             m_AnalysisParams = new AnalysisParams
@@ -223,8 +220,6 @@ namespace Unity.ProjectAuditor.Editor.Tests.Common
         protected void Build(bool isDevelopment = true, string buildFileName = "test", Action preBuildAction = null, Action postBuildAction = null)
         {
             CleanupBuild();
-
-            ValidateTargetPlatform();
 
             // We must save the scene or the build will fail https://unity.slack.com/archives/C3F85MBDL/p1615991512002200
             EditorSceneManager.SaveScene(SceneManager.GetActiveScene(), s_TempSceneFilename);
@@ -276,11 +271,6 @@ namespace Unity.ProjectAuditor.Editor.Tests.Common
         protected ReportItem[] GetIssuesForAssetRelativePath(string testAssetRelativePath)
         {
             return m_ReportItems.Where(i => i.IsIssue() && i.RelativePath == testAssetRelativePath).ToArray();
-        }
-
-        protected void ValidateTargetPlatform()
-        {
-            Assert.IsTrue(BuildPipeline.IsBuildTargetSupported(BuildPipeline.GetBuildTargetGroup(m_Platform), m_Platform));
         }
     }
 }

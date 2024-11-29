@@ -8,6 +8,11 @@ using UnityEngine;
 namespace Unity.ProjectAuditor.Editor
 {
     /// <summary>
+    /// A delegate type for a function to determine whether the Editor supports a given BuildTargetGroup and BuildTarget.
+    /// </summary>
+    internal delegate bool IsASupportedBuildTarget(BuildTargetGroup buildTargetGroup, BuildTarget target);
+
+    /// <summary>
     /// Represents an object which can be passed to an instance of <see cref="ProjectAuditor"/> to specify how analysis should be performed and to provide delegates to be called when analysis steps have completed.
     /// AnalysisParams defaults to values which instruct ProjectAuditor to analyze everything in the project for the current build target, but instances can be populated with custom data in an object initializer to provide additional constraints.
     /// </summary>
@@ -79,6 +84,13 @@ namespace Unity.ProjectAuditor.Editor
         /// </summary>
         public DiagnosticParams DiagnosticParams;
 
+        /// <summary>
+	/// This delegate is called at the start of an analysis to determine whether a given BuildTargetGroup and BuildTarget are supported by this Editor version.
+        /// </summary>
+        [JsonIgnore]
+        [NonSerialized]
+        internal IsASupportedBuildTarget SupportedBuildTarget;
+
         // AnalysisParams copy of the global rules. Can be added to with WithAdditionalDiagnosticRules but doesn't need
         // to be exposed to the API.
         [JsonProperty("Rules")]
@@ -113,6 +125,7 @@ namespace Unity.ProjectAuditor.Editor
             Platform = BuildTarget.NoTarget;
             CodeOptimization = CodeOptimization.Release;
             CompilationMode = CompilationMode.Player;
+            SupportedBuildTarget = BuildPipeline.IsBuildTargetSupported;
         }
 
         /// <summary>
