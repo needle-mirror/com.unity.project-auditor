@@ -1,6 +1,6 @@
 {
   "name": "com.unity.project-auditor",
-  "version": "1.0.0-pre.3",
+  "version": "1.0.0-pre.4",
   "displayName": "Project Auditor",
   "unity": "2020.3",
   "description": "Project Auditor is a static analysis tool that analyzes assets, settings, and scripts of the Unity project and produces a report containing: Code and Settings Diagnostics, the last BuildReport, and assets information.",
@@ -13,18 +13,18 @@
     "com.unity.nuget.newtonsoft-json": "3.2.1"
   },
   "relatedPackages": {
-    "com.unity.project-auditor.tests": "1.0.0-pre.3"
+    "com.unity.project-auditor.tests": "1.0.0-pre.4"
   },
   "_upm": {
     "changelog": "### Added\n\n### Changed\n* Changed the colours on the summary so the icons and charts match those from style guides\n\n### Removed\n\n### Fixed\n* Fix for COPT-3240; welcome screen text layout breaks.\n* Fix for COPT-3241; don't allow sorting on the Build Steps page.\n* Fix for COPT-3246; build steps - clicking on an item with long text removes ability to scroll the table.\n* Fix for COPT-3250; fill out the project revision field on the summary page.\n* Fix for COPT-3252; make sorting by name use alphanumeric comparison, and ignore case\n* Fix for COPT-3254; grouped animation clip length now sorts by value rather than alphabetically\n* Fix for COPT-3257; make enough room for the close bracket.\n* Fix for COPT-3259; stop the shader variant checkbox from vanishing when you tick it.\n* Fix for COPT-3260; fix the shader variant UI path to match it's location in Unity 6.\n* Fix for COPT-3262; issue where summary page could be broken when performing a new analysis after loading an existing one.\n* Fix for COPT-3263; remove the clear and apply buttons from the domain reload filter dialog.\n* Fix for COPT-3276; loading a report in a different project results in errors when opening issues.\n* Fix for COPT-3277; give user an option to enable all analysis categories if none are selected when starting a new analysis.\n* Fix for COPT-3279; when exporting csv after loading/serializing we could have the same column repeated.\n* Fix for COPT-3280; export button can be hard to click, changed to a dropdown.\n* Fix for COPT-3281; blank project produces over 7800 issues.\n* Fix for COPT-3283; summary updates and shows information about ignored items.\n* Fix for COPT-3286; make the group by section in the table header wider.\n* Fix for COPT-3288; shader compiler messages platform column contains numbers.\n* Fix for COPT-3291; remove page for compute shaders for now because it's broken.\n* Fix for COPT-3293; set a maximum width for the inspect buttons in the summary section.\n* Fix for COPT-3295; fix for clicking 'more details' in the top ten producing errors when clicked\n* Fix for COPT-3296; don't show the filter option on the context menu if multiple items are selected, and change not to include the item name.\n* Fix for COPT-3299; avoid Area filters affecting analysis views that don't support them.\n* Fix for COPT-3300; include/exclude ignored items button is confusing from a UI perspective.\n* Fix for COPT-3302; severity levels could be unset after loading in an old analysis.\n* Fix for COPT-3303; 'Unknown' severity could be shown if severity levels were unset.\n* Fix for COPT-3304; show a dialog to tell the user this report doesn't match the project and disable analysis on areas.\n* Fix for COPT-3305; rename 'Num Variants' to 'Max Variants' to clarify the column's meaning.\n* Fix for COPT-3309; improved UX around Quick Fix.\n* Fix for COPT-3314; don't show a filtering context menu if the active view doesn't support the \"Filters\" section.\n* Fix for COPT-3318; null reference when CSV exporting the build size data.\n* Fix for COPT-3319; fix for the status bar being cut off the bottom of the window.\n* Fix for COPT-3324; fix audio clip module name from \"AudioClips\" to \"Audio Clips\"\n* Fix for COPT-3330; exporting doesn't work on startup with the window open.\n* Fix for COPT-3334; unhide the packages Name column to be consistent with the right click menu.\n* Fix for COPT-3336; remove question marks on the end of some fields.\n* Fix for COPT-3337; re-enable the domain reload analysis.\n* Fix for COPT-3341; change the package description.\n* Fix for COPT-3343; fix for ignored issues not being exported in CSV.\n* Fix for COPT-3345; fix project areas preference not applying correctly.\n* Fix for COPT-3351; don't cut Windows computer names short, and fix Mac platform naming.\n* Fix for COPT-3355; fail build on issues option re-worded.\n* Fix for COPT-3370; correct sorting in package name column.\n* Fix for COPT-3373; fix for warning about a missing layout.\n* Fix for COPT-3374; add support for SpriteAtlas analysis.\n* Fix for COPT-3375; some old reports would not load correctly due to invalid layo"
   },
   "upmCi": {
-    "footprint": "87996a34d1fa7c5be5b164e08cadb040acb14956"
+    "footprint": "a85ad3c0fef7f9ccb6baf35504206398b941c2c9"
   },
   "documentationUrl": "https://docs.unity3d.com/Packages/com.unity.project-auditor@1.0/manual/index.html",
   "repository": {
     "url": "https://github.cds.internal.unity3d.com/unity/ProjectAuditor.git",
     "type": "git",
-    "revision": "04868102d9ab46067d154018905f7ac6542e6833"
+    "revision": "86d1d45782f9fec8183db33d3678253ab8569a8c"
   }
 }
