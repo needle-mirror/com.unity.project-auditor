@@ -4,6 +4,132 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [1.0.0-pre.1] - 2024-11-29
+
+### Added
+
+### Changed
+* Changed the colours on the summary so the icons and charts match those from style guides
+
+### Removed
+
+### Fixed
+* Fix for COPT-3240; welcome screen text layout breaks.
+* Fix for COPT-3241; don't allow sorting on the Build Steps page.
+* Fix for COPT-3246; build steps - clicking on an item with long text removes ability to scroll the table.
+* Fix for COPT-3250; fill out the project revision field on the summary page.
+* Fix for COPT-3252; make sorting by name use alphanumeric comparison, and ignore case
+* Fix for COPT-3254; grouped animation clip length now sorts by value rather than alphabetically
+* Fix for COPT-3257; make enough room for the close bracket.
+* Fix for COPT-3259; stop the shader variant checkbox from vanishing when you tick it.
+* Fix for COPT-3260; fix the shader variant UI path to match it's location in Unity 6.
+* Fix for COPT-3262; issue where summary page could be broken when performing a new analysis after loading an existing one.
+* Fix for COPT-3263; remove the clear and apply buttons from the domain reload filter dialog.
+* Fix for COPT-3276; loading a report in a different project results in errors when opening issues.
+* Fix for COPT-3277; give user an option to enable all analysis categories if none are selected when starting a new analysis.
+* Fix for COPT-3279; when exporting csv after loading/serializing we could have the same column repeated.
+* Fix for COPT-3280; export button can be hard to click, changed to a dropdown.
+* Fix for COPT-3281; blank project produces over 7800 issues.
+* Fix for COPT-3283; summary updates and shows information about ignored items.
+* Fix for COPT-3286; make the group by section in the table header wider.
+* Fix for COPT-3288; shader compiler messages platform column contains numbers.
+* Fix for COPT-3291; remove page for compute shaders for now because it's broken.
+* Fix for COPT-3293; set a maximum width for the inspect buttons in the summary section.
+* Fix for COPT-3295; fix for clicking 'more details' in the top ten producing errors when clicked
+* Fix for COPT-3296; don't show the filter option on the context menu if multiple items are selected, and change not to include the item name.
+* Fix for COPT-3299; avoid Area filters affecting analysis views that don't support them.
+* Fix for COPT-3300; include/exclude ignored items button is confusing from a UI perspective.
+* Fix for COPT-3302; severity levels could be unset after loading in an old analysis.
+* Fix for COPT-3303; 'Unknown' severity could be shown if severity levels were unset.
+* Fix for COPT-3304; show a dialog to tell the user this report doesn't match the project and disable analysis on areas.
+* Fix for COPT-3305; rename 'Num Variants' to 'Max Variants' to clarify the column's meaning.
+* Fix for COPT-3309; improved UX around Quick Fix.
+* Fix for COPT-3314; don't show a filtering context menu if the active view doesn't support the "Filters" section.
+* Fix for COPT-3318; null reference when CSV exporting the build size data.
+* Fix for COPT-3319; fix for the status bar being cut off the bottom of the window.
+* Fix for COPT-3324; fix audio clip module name from "AudioClips" to "Audio Clips"
+* Fix for COPT-3330; exporting doesn't work on startup with the window open.
+* Fix for COPT-3334; unhide the packages Name column to be consistent with the right click menu.
+* Fix for COPT-3336; remove question marks on the end of some fields.
+* Fix for COPT-3337; re-enable the domain reload analysis.
+* Fix for COPT-3341; change the package description.
+* Fix for COPT-3343; fix for ignored issues not being exported in CSV.
+* Fix for COPT-3345; fix project areas preference not applying correctly.
+* Fix for COPT-3351; don't cut Windows computer names short, and fix Mac platform naming.
+* Fix for COPT-3355; fail build on issues option re-worded.
+* Fix for COPT-3370; correct sorting in package name column.
+* Fix for COPT-3373; fix for warning about a missing layout.
+* Fix for COPT-3374; add support for SpriteAtlas analysis.
+* Fix for COPT-3375; some old reports would not load correctly due to invalid layout infomration.
+* Fix for COPT-3395; gave project auditor project settings panel a UX pass.
+* Fix for COPT-3377; improve handling for loading random JSON files.
+* Fix for COPT-3378; update summary name title based on report's filename.
+* Fix for COPT-3380; change the wording on the "not been analyzed" message.
+* Fix for COPT-3389; project setup -> settings in the text
+* Fix for COPT-3391; match platform strings with Build Profiles menu.  
+* Fix for COPT-3394; swap the save and load buttons to match other profiling tools.
+* Fix for COPT-3399; sanitise project name when using it as the default save name for a report.
+* Fix for COPT-3405; group heading can clip with next column in table.
+
+## [0.11.0] - 2023-05-03
+
+### Added
+* Autosave feature keeps current report persistent upon closing Project Auditor
+* Summary UI shows a report's display name with star indicator for an unsaved report
+* Requester when a report is unsaved and user clicks "New Analysis" button
+* Display/Ignore All buttons
+* Copy-to-Clipboard buttons to Details and Recommendations
+* Vertical scrollbar to Details and Recommendations
+* CompilationMode selection to Welcome page
+* Shader view reports total property count and texture property count for Unity 2019.3 and above
+* Compute shader variant view reports kernel thread count for Unity 2021.2 and above
+* View-specific descriptions
+* AudioClip diagnostics
+* Material list view in shader module
+* AnimatorController reporting
+* AnimationClip reporting
+* Avatar reporting
+* AvatarMask reporting
+* Domain Reload Roslyn analyzer
+* New Area category for IterationTime issues
+* Code/Domain Reload view, showing any issues raised by the Domain Reload Roslyn analyzer
+* Domain Reload diagnostic issues in the Settings view if Domain Reload is enabled
+* Diagnostics for unsupported APIs on WebGL target
+* Diagnostic for Static Batching being enabled whilst Entities Graphics is installed
+* Support for cancelling analysis
+
+### Changed
+* UI redesign of Summary showing issue breakdown, list of top ten issues, and buttons to jump to additional insights/views
+* Improved issue description and suggestion strings, to make them clearer and more consistent
+* Solid Color Texture analyzer now works for all texture types (2D, 2DArray, 3D, Cube) in Unity 2019.2 and above
+* Upgrade com.unity.nuget.mono-cecil to 1.11.4
+* Visualization of the Horizontal Stacked Bar and Legend Item
+* Improved AudioClip asset table
+* Clear table selection on unmuting issues
+* Move some data that should be user-configurable to UserPreferences
+* Report serialization files changed so that saved JSON is <= half the size it was before
+* Configuration is now handled via a ProjectAuditorSettings class/asset
+* Refactored and documented public API to allow CI/CD integration
+* Refactored, exposed and documented API to allow the creation of custom ModuleAnalyzers
+* Table views automatically resize columns to fit the data being displayed
+* Almost complete rewrite of the package documentation
+
+### Removed
+* Actions section and Mute/Unmute buttons
+* Settings from ProjectAuditorConfig
+* Support for Unity 2018 and 2019.
+* BuildReports are no longer saved into the project's Assets folder, and are instead cached in callbacks or read directly from the Library folder.
+
+### Fixed
+* Analysis never completes if an exception is thrown
+* Compilation if both URP and HDRP are installed
+* UI default column sorting
+* UI sorting criteria persistence after domain reload
+* Config changes not saved to corresponding asset
+* Ignoring texture streaming issues
+* Texture size reporting on Unity 2022.2 and above is now accurate
+* Unusually-formatted compiler warnings (such as the one generated by including mcs.rsp in the project) no longer cause all code compilation and analysis to silently fail.
+
 ## [0.10.0] - 2023-05-03
 
 ### Changed
@@ -91,7 +217,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 * Build Report object name
 * Text alignment and wrapping issues
 * Build report steps text wrapping
-* Diagnostics _critical_ property persistence after domain reload  
+* Diagnostics _critical_ property persistence after domain reload
 * Improved text search to match custom properties
 
 ## [0.8.4-preview] - 2022-09-27
@@ -166,7 +292,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Fixed
 * Reporting of assemblies not compiled due to dependencies
 * Improved code diagnostic messages
-* Improved UI groups to support arbitrary grouping criteria 
+* Improved UI groups to support arbitrary grouping criteria
 
 ### Removed
 * Removed the need to have a Descriptor associated with non-diagnostic issues
@@ -193,8 +319,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 * *OnRenderObject* and *OnWillRenderObject* to list of MonoBehavior critical contexts
 * Compilation Time property to Assemblies view
-* Public API to get float/double custom property 
-* Context menu item to open selected issue 
+* Public API to get float/double custom property
+* Context menu item to open selected issue
 
 ### Changed
 * Optimized viewing and sorting UI performance
@@ -348,7 +474,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 * Reporting of issues affecting multiple areas
 * Background analysis that results in code issues with empty filenames
 * Android player.log parsing
-* *GraphicsSettings.logWhenShaderIsCompiled* compilation error on early 2018.4.x releases 
+* *GraphicsSettings.logWhenShaderIsCompiled* compilation error on early 2018.4.x releases
 * Reduced UI managed allocations
 
 ## [0.4.2-preview] - 2021-02-01

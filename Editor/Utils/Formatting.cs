@@ -1,4 +1,6 @@
 using System;
+using System.Globalization;
+using System.Text.RegularExpressions;
 using UnityEditor;
 
 namespace Unity.ProjectAuditor.Editor.Utils
@@ -22,7 +24,17 @@ namespace Unity.ProjectAuditor.Editor.Utils
         /// <returns>A string representation of the input value.</returns>
         public static string FormatDuration(TimeSpan timeSpan)
         {
-            return timeSpan.Hours + ":" + timeSpan.Minutes.ToString("D2") + ":" + timeSpan.Seconds.ToString("D2");
+            return $"{timeSpan.Hours:00}:{timeSpan.Minutes:00}:{timeSpan.Seconds:00}";
+        }
+
+        /// <summary>
+        /// Formats a given TimeSpan object as a string in the format "HH:mm:ss".
+        /// </summary>
+        /// <param name="timeSpan">The TimeSpan object to format.</param>
+        /// <returns>A string representation of the input value.</returns>
+        public static string FormatDurationWithMs(TimeSpan timeSpan)
+        {
+            return $"{timeSpan.Minutes:00}:{timeSpan.Seconds:00}.{timeSpan.Milliseconds:000}";
         }
 
         /// <summary>
@@ -53,13 +65,15 @@ namespace Unity.ProjectAuditor.Editor.Utils
         }
 
         /// <summary>
-        /// Formats a decimal number as a percentage with one decimal place.
+        /// Formats a decimal number as a percentage with a specified number of decimal places.
         /// </summary>
         /// <param name="number">The decimal number to format.</param>
+        /// <param name="numDecimalPlaces">Number of decimals.</param>
         /// <returns>A string representation of the decimal number as a percentage.</returns>
-        public static string FormatPercentage(float number)
+        public static string FormatPercentage(float number, int numDecimalPlaces = 0)
         {
-            return $"{number:P1}";
+            var formatString = $"{{0:F{numDecimalPlaces}}}";
+            return string.Format(CultureInfo.InvariantCulture.NumberFormat, formatString, (100.0f * number)) + "%";
         }
 
         /// <summary>
@@ -70,6 +84,36 @@ namespace Unity.ProjectAuditor.Editor.Utils
         public static string FormatSize(ulong size)
         {
             return EditorUtility.FormatBytes((long)size);
+        }
+
+        /// <summary>
+        /// Formats a given frequency as a string in the format "X Hz" or "X kHz".
+        /// </summary>
+        /// <param name="size">Frequency value to format.</param>
+        /// <returns>A string representation of the input value as a frequency in Hz or kHz.</returns>
+        public static string FormatHz(int frequency)
+        {
+            return (frequency < 1000) ? $"{frequency} Hz" : $"{((float)frequency / 1000.0f):G0} kHz";
+        }
+
+        /// <summary>
+        /// Formats a given float duration as a string in the format "X.XXX s".
+        /// </summary>
+        /// <param name="length">Length value to format.</param>
+        /// <returns>A string representation of the input value as a duration in seconds.</returns>
+        public static string FormatLengthInSeconds(float length)
+        {
+            return length.ToString("F3") + " s";
+        }
+
+        /// <summary>
+        /// Formats a given float framerate as a string in the format "X fps".
+        /// </summary>
+        /// <param name="framerate">Framerate value to format.</param>
+        /// <returns>A string representation of the input value as a framerate.</returns>
+        public static string FormatFramerate(float framerate)
+        {
+            return framerate + " fps";
         }
 
         static readonly string k_StringSeparator = ", ";
@@ -87,6 +131,56 @@ namespace Unity.ProjectAuditor.Editor.Utils
         public static string ReplaceStringSeparators(string combinedString, string separator)
         {
             return combinedString.Replace(k_StringSeparator, separator);
+        }
+
+        public static string StripRichTextTags(string text)
+        {
+            text = RemoveRichTextTag(text, "b", string.Empty);
+            text = RemoveRichTextTag(text, "i", string.Empty);
+            text = RemoveRichTextTag(text, "u", string.Empty);
+            text = RemoveRichTextTag(text, "color", string.Empty);
+
+            return text;
+        }
+
+        static string RemoveRichTextTag(string input, string tagName, string replaceWith)
+        {
+            const string k_RichTextTagRegExp = "</?{0}[^<]*?>";
+
+            var reg = new Regex(String.Format(k_RichTextTagRegExp, tagName), RegexOptions.IgnoreCase);
+            return reg.Replace(input, replaceWith);
+        }
+
+        // Strings to match the new Build Profiles page. We can't access them directly right now, so duplicate.
+        public static string GetModernBuildTargetName(BuildTarget buildTarget)
+        {
+            switch (buildTarget)
+            {
+                case BuildTarget.StandaloneOSX:             return "macOS";
+                case BuildTarget.StandaloneWindows:         return "Windows (32 bit)";
+                case BuildTarget.StandaloneWindows64:       return "Windows";
+                case BuildTarget.iOS:                       return "iOS";
+                case BuildTarget.Android:                   return "Android™";
+                case BuildTarget.WebGL:                     return "Web";
+                case BuildTarget.WSAPlayer:                 return "Universal Windows Platform";
+                case BuildTarget.StandaloneLinux64:         return "Linux";
+                case BuildTarget.PS4:                       return "PlayStation®4";
+                case BuildTarget.tvOS:                      return "tvOS";
+                case BuildTarget.Switch:                    return "Nintendo Switch™";
+                case BuildTarget.XboxOne:
+                case BuildTarget.GameCoreXboxOne:           return "Xbox One";
+                case BuildTarget.GameCoreXboxSeries:        return "Xbox Series X|S";
+                case BuildTarget.PS5:                       return "PlayStation®5";
+#if UNITY_2021_3_OR_NEWER
+                case BuildTarget.LinuxHeadlessSimulation:   return "Linux Headless Simulation";
+                case BuildTarget.EmbeddedLinux:             return "Embedded Linux";
+#endif
+#if UNITY_2022_3_OR_NEWER
+                case BuildTarget.QNX:                       return "QNX®";
+                case BuildTarget.VisionOS:                  return "visionOS";
+#endif
+                default: return BuildPipeline.GetBuildTargetName(buildTarget);
+            }
         }
     }
 }

@@ -1,4 +1,6 @@
 using System;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace Unity.ProjectAuditor.Editor.Core
 {
@@ -8,12 +10,13 @@ namespace Unity.ProjectAuditor.Editor.Core
         Descriptor,
         Severity,
         LogLevel,
-        Area,
+        Areas,
         Path,
         Directory,
         Filename,
         FileType,
         Platform,
+        IsIgnored,
         Num
     }
 
@@ -35,6 +38,7 @@ namespace Unity.ProjectAuditor.Editor.Core
         }
     }
 
+    [JsonConverter(typeof(StringEnumConverter))]
     internal enum PropertyFormat
     {
         String = 0,
@@ -48,11 +52,12 @@ namespace Unity.ProjectAuditor.Editor.Core
 
     internal struct PropertyDefinition
     {
-        public PropertyType type;
-        public PropertyFormat format;
-        public string name;
-        public string longName;
-        public bool defaultGroup;
-        public bool hidden;
+        public PropertyType Type;
+        public PropertyFormat Format;
+        public string Name;
+        public string LongName;
+        public int MaxAutoWidth;
+        public bool IsDefaultGroup;
+        public bool IsHidden;
     }
 }

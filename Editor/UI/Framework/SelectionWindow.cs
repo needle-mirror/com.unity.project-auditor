@@ -54,19 +54,6 @@ namespace Unity.ProjectAuditor.Editor.UI.Framework
         void OnGUI()
         {
             EditorGUILayout.BeginVertical(GUILayout.ExpandWidth(true));
-            var style = new GUIStyle(GUI.skin.label);
-            style.alignment = TextAnchor.MiddleLeft;
-            GUILayout.Label("Select : ", style);
-
-            EditorGUILayout.BeginHorizontal();
-            if (GUILayout.Button("Clear", GUILayout.Width(50)))
-                m_SelectionTable.ClearSelection();
-            if (GUILayout.Button("Apply", GUILayout.Width(50)))
-            {
-                ApplySelection();
-            }
-
-            EditorGUILayout.EndHorizontal();
 
             if (m_SelectionTable != null)
             {
