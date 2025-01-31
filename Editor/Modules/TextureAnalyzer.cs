@@ -157,7 +157,7 @@ namespace Unity.ProjectAuditor.Editor.Modules
                     .WithLocation(context.Importer.assetPath);
             }
 
-            if (context.Importer.mipmapEnabled && !context.Importer.streamingMipmaps && context.Size > Mathf.Pow(m_StreamingMipmapsSizeLimit, 2))
+            if (context.Importer.mipmapEnabled && !context.Importer.streamingMipmaps && context.Texture.width * context.Texture.height > Mathf.Pow(m_StreamingMipmapsSizeLimit, 2))
             {
                 yield return context.CreateIssue(IssueCategory.AssetIssue, k_TextureStreamingMipMapEnabledDescriptor.Id, context.Name)
                     .WithLocation(context.Importer.assetPath);

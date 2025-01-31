@@ -4,6 +4,25 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [1.0.0-pre.7] - 2025-01-31
+
+### Added
+
+### Changed
+
+### Removed
+
+### Fixed
+* Fix for COPT-3333; have the Assembly view always deal in milliseconds for time values to help with eg. consistency in exported data.
+* Fix for COPT-3376; don't look at compiled assemblies if this is a different project.
+* Fix for COPT-3401; clear the search strings when starting/loading an analysis.
+* Fix for COPT-3412; avoid issues with zoom slider for now by hiding it.
+* Fix for COPT-3415; show message instead of NaN for Assembly Compile Time when Compilation Mode is set to Editor.
+* Fix for COPT-3418; optimize performance when selecting to group by in large tables.
+* Fix for COPT-3428; guard against issues from analysing empty sprite atlases.
+* Fix for COPT-3440; remove the asset category from the shader module so it doesn't get analyzed with shaders.
+* Fix for COPT-3452; audio clips runtime size is often wrong.
+
 ## [1.0.0-pre.6] - 2024-11-29
 
 ### Added
@@ -70,6 +89,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 * Fix for COPT-3394; swap the save and load buttons to match other profiling tools.
 * Fix for COPT-3399; sanitise project name when using it as the default save name for a report.
 * Fix for COPT-3405; group heading can clip with next column in table.
+* Fix for COPT-3409; have desktop platforms grouped for project settings.
 
 ## [0.11.0] - 2023-05-03
 

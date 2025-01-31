@@ -157,6 +157,9 @@ namespace Unity.ProjectAuditor.Editor.UI
             if (UserPreferences.AnalyzePackagesForIssues == true)
                 return true;
 
+            if (issue.Location == null)
+                return false;
+
             if ((issue.Location.Path.IndexOf("packages/", StringComparison.OrdinalIgnoreCase) >= 0)
                 || (issue.Location.Path.IndexOf("Unity.SourceGenerators/", StringComparison.OrdinalIgnoreCase) >= 0))
             {
@@ -903,6 +906,7 @@ namespace Unity.ProjectAuditor.Editor.UI
                 OnOpenIssue = EditorInterop.FocusOnAssetInProjectWindow,
                 AnalyticsEventId = (int)AnalyticsReporter.UIButton.Assemblies
             });
+            int assemblyProperty = Convert.ToInt32(CodeProperty.Assembly);
             ViewDescriptor.Register(new ViewDescriptor
             {
                 Category = IssueCategory.Code,
@@ -914,7 +918,7 @@ namespace Unity.ProjectAuditor.Editor.UI
                 ShowFilters = true,
                 ShowInfoPanel = true,
                 DependencyViewGuiContent = new GUIContent("Inverted Call Hierarchy", "Expand the tree to see all of the methods which lead to the call site of a selected issue."),
-                GetAssemblyName = issue => issue.GetCustomProperty(CodeProperty.Assembly),
+                GetAssemblyName = issue => issue.GetCustomProperty(assemblyProperty),
                 OnOpenIssue = EditorInterop.OpenTextFile<TextAsset>,
                 OnOpenManual = EditorInterop.OpenCodeDescriptor,
                 Type = typeof(CodeDiagnosticView),
@@ -986,6 +990,7 @@ namespace Unity.ProjectAuditor.Editor.UI
                 Type = typeof(BuildSizeView),
                 AnalyticsEventId = (int)AnalyticsReporter.UIButton.BuildFiles
             });
+            int domainReloadAssemblyProperty = Convert.ToInt32(CompilerMessageProperty.Assembly);
             ViewDescriptor.Register(new ViewDescriptor
             {
                 Category = IssueCategory.DomainReload,
@@ -995,7 +1000,7 @@ namespace Unity.ProjectAuditor.Editor.UI
                 ShowAssemblySelection = true,
                 ShowFilters = true,
                 ShowInfoPanel = true,
-                GetAssemblyName = issue => issue.GetCustomProperty(CompilerMessageProperty.Assembly),
+                GetAssemblyName = issue => issue.GetCustomProperty(domainReloadAssemblyProperty),
                 OnOpenIssue = EditorInterop.OpenTextFile<TextAsset>,
                 OnOpenManual = EditorInterop.OpenCodeDescriptor,
                 Type = typeof(CodeDomainReloadView),
@@ -1596,12 +1601,19 @@ namespace Unity.ProjectAuditor.Editor.UI
 
                 GUILayout.FlexibleSpace();
 
+                // Disable zoom option for now since it doesn't behave very well (and there doesn't seem to be any similar
+                // functionality in the rest of Unity). COPT-3412
+                // Allow the size-setting code to still run, in case non-default values were stored from a previous version.
+#if ENABLE_TEXT_ZOOM
                 EditorGUILayout.LabelField(Utility.GetIcon(Utility.IconType.ZoomTool), EditorStyles.label,
                     GUILayout.ExpandWidth(false), GUILayout.Width(20));
 
                 var fontSize = (int)GUILayout.HorizontalSlider(m_ViewStates.fontSize, ViewStates.DefaultMinFontSize,
                     ViewStates.DefaultMaxFontSize, GUILayout.ExpandWidth(false),
                     GUILayout.Width(AnalysisView.ToolbarButtonSize));
+#else
+                var fontSize = ViewStates.DefaultMinFontSize;
+#endif
                 if (fontSize != m_ViewStates.fontSize)
                 {
                     m_ViewStates.fontSize = fontSize;
@@ -1798,7 +1810,11 @@ namespace Unity.ProjectAuditor.Editor.UI
                 var assemblyNames = m_Report.FindByCategory(IssueCategory.Assembly).Select(i => i.Description)
                     .ToArray();
                 string[] allAssemblies = assemblyNames.Distinct().OrderBy(str => str).ToArray();
-                m_AssemblyNames = allAssemblies.Where(a => !AssemblyInfoProvider.IsPackageAssembly(a)).ToArray();
+
+                if (m_Report.IsForCurrentProject())
+                    m_AssemblyNames = allAssemblies.Where(a => !AssemblyInfoProvider.IsPackageAssembly(a)).ToArray();
+		else
+                    m_AssemblyNames = allAssemblies;
             }
         }
 
@@ -1825,34 +1841,37 @@ namespace Unity.ProjectAuditor.Editor.UI
                 }
             }
 
-            if (forceRefresh || !m_AssemblySelection.selection.Any())
+            if (m_Report.IsForCurrentProject())
             {
-                // initial selection setup:
-                // - assemblies from user scripts or editable packages, or
-                // - default assembly, or,
-                // - all generated assemblies
-                IEnumerable<string> compiledAssemblies = null;
-
-                if (UserPreferences.AnalyzePackagesForIssues)
-                    compiledAssemblies = m_AssemblyNames.Where(a => !AssemblyInfoProvider.IsUnityEngineAssembly(a));
-                else
-                    compiledAssemblies = m_AssemblyNames.Where(a => !AssemblyInfoProvider.IsPackageAssembly(a));
-
-                compiledAssemblies = compiledAssemblies.Where(a =>
-                    !AssemblyInfoProvider.IsReadOnlyAssembly(a)).ToArray();
-                m_AssemblySelection.selection.AddRange(compiledAssemblies);
-
-                if (m_DefaultAssemblies == null)
-                    m_DefaultAssemblies = new List<string>(m_AssemblySelection.selection.Count);
-
-                m_DefaultAssemblies.AddRange(m_AssemblySelection.selection);
-
-                if (!m_AssemblySelection.selection.Any())
+                if (forceRefresh || !m_AssemblySelection.selection.Any())
                 {
-                    if (m_AssemblyNames.Contains(AssemblyInfo.DefaultAssemblyName))
-                        m_AssemblySelection.Set(AssemblyInfo.DefaultAssemblyName);
+                    // initial selection setup:
+                    // - assemblies from user scripts or editable packages, or
+                    // - default assembly, or,
+                    // - all generated assemblies
+                    IEnumerable<string> compiledAssemblies = null;
+
+                    if (UserPreferences.AnalyzePackagesForIssues)
+                        compiledAssemblies = m_AssemblyNames.Where(a => !AssemblyInfoProvider.IsUnityEngineAssembly(a));
                     else
-                        m_AssemblySelection.SetAll(m_AssemblyNames);
+                        compiledAssemblies = m_AssemblyNames.Where(a => !AssemblyInfoProvider.IsPackageAssembly(a));
+
+                    compiledAssemblies = compiledAssemblies.Where(a =>
+                        !AssemblyInfoProvider.IsReadOnlyAssembly(a)).ToArray();
+                    m_AssemblySelection.selection.AddRange(compiledAssemblies);
+
+                    if (m_DefaultAssemblies == null)
+                        m_DefaultAssemblies = new List<string>(m_AssemblySelection.selection.Count);
+
+                    m_DefaultAssemblies.AddRange(m_AssemblySelection.selection);
+
+                    if (!m_AssemblySelection.selection.Any())
+                    {
+                        if (m_AssemblyNames.Contains(AssemblyInfo.DefaultAssemblyName))
+                            m_AssemblySelection.Set(AssemblyInfo.DefaultAssemblyName);
+                        else
+                            m_AssemblySelection.SetAll(m_AssemblyNames);
+                    }
                 }
             }
 
@@ -2128,6 +2147,7 @@ namespace Unity.ProjectAuditor.Editor.UI
 
             // switch to summary view after loading
             m_ViewManager.ChangeView(IssueCategory.Metadata);
+            m_ViewManager.GetActiveView().SetSearch("");
         }
 
         string GetAutosaveFilename()

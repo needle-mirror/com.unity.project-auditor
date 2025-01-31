@@ -52,7 +52,7 @@ namespace Unity.ProjectAuditor.Editor.Modules
             {
                 new PropertyDefinition { Type = PropertyType.LogLevel, Name = "Log Level"},
                 new PropertyDefinition { Type = PropertyType.Description, Name = "Assembly Name", MaxAutoWidth = 800},
-                new PropertyDefinition { Type = PropertyTypeUtil.FromCustom(AssemblyProperty.CompileTime), Format = PropertyFormat.Time, Name = "Compile Time (seconds)"},
+                new PropertyDefinition { Type = PropertyTypeUtil.FromCustom(AssemblyProperty.CompileTime), Format = PropertyFormat.String, Name = "Compile Time"},
                 new PropertyDefinition { Type = PropertyTypeUtil.FromCustom(AssemblyProperty.ReadOnly), Format = PropertyFormat.Bool, Name = "Read Only", IsDefaultGroup = true},
                 new PropertyDefinition { Type = PropertyType.Path, Name = "Asmdef Path"},
             }
@@ -136,6 +136,23 @@ namespace Unity.ProjectAuditor.Editor.Modules
             base.Initialize();
 
             m_OpCodes = GetAnalyzers().Select(a => a.opCodes).SelectMany(c => c).Distinct().ToList();
+
+            ProjectIssueExtensions.AddCustomComparer(IssueCategory.Assembly, PropertyTypeUtil.FromCustom(AssemblyProperty.CompileTime),
+                (a, b) =>
+                {
+                    var strA = a.GetProperty(PropertyTypeUtil.FromCustom(AssemblyProperty.CompileTime));
+                    var strB = b.GetProperty(PropertyTypeUtil.FromCustom(AssemblyProperty.CompileTime));
+
+                    // If one result is N/A, they all are (the analysis was done with Editor compilation - see below in this file)
+                    if (strA.StartsWith("N/A"))
+                        return 0;
+
+                    // Cut off the ' ms' at the end
+                    var longA = long.Parse(strA.Substring(0, strA.Length - 3));
+                    var longB = long.Parse(strB.Substring(0, strB.Length - 3));
+
+                    return longA < longB ? -1 : longA > longB ? 1 : 0;
+                });
         }
 
         public override AnalysisResult Audit(AnalysisParams analysisParams, IProgress progress = null)
@@ -241,7 +258,7 @@ namespace Unity.ProjectAuditor.Editor.Modules
                     .WithCustomProperties(new object[(int)AssemblyProperty.Num]
                     {
                         assemblyInfo.IsPackageReadOnly,
-                        float.NaN
+                        "N/A when Compilation Mode is Editor"
                     })
                     .WithLocation(assemblyInfo.AsmDefPath))
                     .ToArray();
@@ -502,7 +519,7 @@ namespace Unity.ProjectAuditor.Editor.Modules
                 .WithCustomProperties(new object[(int)AssemblyProperty.Num]
                 {
                     assemblyInfo.IsPackageReadOnly,
-                    compilationResult.DurationInMs
+                    compilationResult.DurationInMs + " ms"
                 })
                 .WithDependencies(new AssemblyDependencyNode(assemblyInfo.Name, compilationResult.DependentAssemblyNames))
                 .WithLocation(assemblyInfo.AsmDefPath)

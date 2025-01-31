@@ -1,6 +1,7 @@
 using System;
 using Newtonsoft.Json;
 using Unity.ProjectAuditor.Editor.Core;
+using Unity.ProjectAuditor.Editor.Utils;
 using UnityEngine;
 
 namespace Unity.ProjectAuditor.Editor
@@ -137,6 +138,25 @@ namespace Unity.ProjectAuditor.Editor
         public string RelativePath
         {
             get { return m_Location == null ? string.Empty : m_Location.Path; }
+        }
+
+        [JsonIgnore] private string cachedExtension = null;
+        /// <summary>
+        /// File extension of the file that contains this issue.
+        /// </summary>
+        [JsonIgnore]
+        public string FileExtension
+        {
+            get
+            {
+                if (cachedExtension == null)
+                {
+                    var extAIndex = PathUtils.GetExtensionIndexFromPath(RelativePath);
+                    cachedExtension = RelativePath.Substring(extAIndex + 1);
+                }
+
+                return cachedExtension;
+            }
         }
 
         /// <summary>

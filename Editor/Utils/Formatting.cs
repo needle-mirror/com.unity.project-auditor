@@ -182,5 +182,31 @@ namespace Unity.ProjectAuditor.Editor.Utils
                 default: return BuildPipeline.GetBuildTargetName(buildTarget);
             }
         }
+
+        public static string GetModernBuildTargetName(BuildTargetGroup buildTargetGroup)
+        {
+            switch (buildTargetGroup)
+            {
+                case BuildTargetGroup.Standalone:              return "Windows, Mac, Linux";
+                case BuildTargetGroup.iOS:                     return GetModernBuildTargetName(BuildTarget.iOS);
+                case BuildTargetGroup.Android:                 return GetModernBuildTargetName(BuildTarget.Android);
+                case BuildTargetGroup.WebGL:                   return GetModernBuildTargetName(BuildTarget.WebGL);
+                case BuildTargetGroup.WSA:                     return GetModernBuildTargetName(BuildTarget.WSAPlayer);
+                case BuildTargetGroup.PS4:                     return GetModernBuildTargetName(BuildTarget.PS4);
+                case BuildTargetGroup.XboxOne:                 return GetModernBuildTargetName(BuildTarget.XboxOne);
+                case BuildTargetGroup.tvOS:                    return GetModernBuildTargetName(BuildTarget.tvOS);
+                case BuildTargetGroup.Switch:                  return GetModernBuildTargetName(BuildTarget.Switch);
+                case BuildTargetGroup.LinuxHeadlessSimulation: return GetModernBuildTargetName(BuildTarget.LinuxHeadlessSimulation);
+                case BuildTargetGroup.GameCoreXboxOne:         return GetModernBuildTargetName(BuildTarget.GameCoreXboxOne);
+                case BuildTargetGroup.GameCoreXboxSeries:      return GetModernBuildTargetName(BuildTarget.GameCoreXboxSeries);
+                case BuildTargetGroup.PS5:                     return GetModernBuildTargetName(BuildTarget.PS5);
+                case BuildTargetGroup.EmbeddedLinux:           return GetModernBuildTargetName(BuildTarget.EmbeddedLinux);
+#if UNITY_2022_3_OR_NEWER
+                case BuildTargetGroup.QNX:                     return GetModernBuildTargetName(BuildTarget.QNX);
+                case BuildTargetGroup.VisionOS:                return GetModernBuildTargetName(BuildTarget.VisionOS);
+#endif
+                default: return "Unknown platform group";
+            }
+        }
     }
 }

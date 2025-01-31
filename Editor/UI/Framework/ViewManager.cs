@@ -202,12 +202,22 @@ namespace Unity.ProjectAuditor.Editor.UI.Framework
         {
             m_Report = report;
             MarkViewColumnWidthsAsDirty();
+
+            foreach (var view in m_Views)
+            {
+                view.SetSearch("");
+            }
         }
 
         public void OnAnalysisRestored(Report report)
         {
             AddIssues(report.GetAllIssues());
             m_Report = report;
+
+            foreach (var view in m_Views)
+            {
+                view.SetSearch("");
+            }
         }
 
         public void LoadSettings()

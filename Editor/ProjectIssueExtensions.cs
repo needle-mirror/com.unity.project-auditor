@@ -140,23 +140,11 @@ namespace Unity.ProjectAuditor.Editor
                     return EditorUtility.NaturalCompare(issueA.Description, issueB.Description);
                 case PropertyType.FileType:
                     {
-                        var pathA = issueA.RelativePath;
-                        var pathB = issueB.RelativePath;
-
-                        var extAIndex = PathUtils.GetExtensionIndexFromPath(pathA);
-                        var extBIndex = PathUtils.GetExtensionIndexFromPath(pathB);
-
-                        return EditorUtility.NaturalCompare(pathA.Substring(extAIndex + 1), pathB.Substring(extBIndex + 1));
+                        return EditorUtility.NaturalCompare(issueA.FileExtension, issueB.FileExtension);
                     }
                 case PropertyType.Filename:
                     {
-                        var pathA = issueA.RelativePath;
-                        var pathB = issueB.RelativePath;
-
-                        var filenameAIndex = PathUtils.GetFilenameIndexFromPath(pathA);
-                        var filenameBIndex = PathUtils.GetFilenameIndexFromPath(pathB);
-
-                        var cf = EditorUtility.NaturalCompare(pathA.Substring(filenameAIndex), pathB.Substring(filenameBIndex));
+                        var cf = EditorUtility.NaturalCompare(issueA.Filename, issueB.Filename);
 
                         // If it's the same filename, see if the lines are different
                         if (cf == 0)

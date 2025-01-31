@@ -7,7 +7,7 @@ namespace Unity.ProjectAuditor.Editor
     /// Project-specific settings.
     /// </summary>
     /// <remarks>
-    /// The settings in this class include the global <see cref="Unity.ProjectAuditor.Editor.DiagnosticParams"/> and a structure containing a list of <see cref="Unity.ProjectAuditor.Editor.Diagnostic.Rule"/>s.
+    /// The settings in this class include the global <see cref="Unity.ProjectAuditor.Editor.DiagnosticParams"/> and a structure containing a list of <see cref="Unity.ProjectAuditor.Editor.Rule"/> instances.
     /// These can be viewed and edited in the Settings > Project Auditor window in the Editor and are saved in ProjectSettings/ProjectAuditorSettings.asset, but
     /// they are not directly exposed to scripts in the package API.
     /// </remarks>

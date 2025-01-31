@@ -80,7 +80,7 @@ namespace Unity.ProjectAuditor.Editor
 
         /// <summary>
         /// The DiagnosticParams object which defines the customizable thresholds for reporting certain diagnostics.
-        /// By default, this makes a copy of ProjectAuditorSettings.<see cref="ProjectAuditorSettings.DiagnosticParams"/>.
+        /// By default, this makes a copy of <see cref="ProjectAuditorSettings"/>.
         /// </summary>
         public DiagnosticParams DiagnosticParams;
 

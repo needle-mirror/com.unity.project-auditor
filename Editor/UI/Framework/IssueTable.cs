@@ -22,7 +22,8 @@ namespace Unity.ProjectAuditor.Editor.UI.Framework
         readonly IssueLayout m_Layout;
         readonly List<TreeViewItem> m_Rows = new List<TreeViewItem>(100);
 
-        List<IssueTableItem> m_TreeViewItemGroups = new List<IssueTableItem>();
+        private Dictionary<string, IssueTableItem>
+            m_TreeViewItemGroupsLookup = new Dictionary<string, IssueTableItem>();
         Dictionary<int, IssueTableItem> m_TreeViewItemIssues;
         List<IssueTableItem> m_SelectedIssues = new List<IssueTableItem>();
         bool m_SelectionChanged = true;
@@ -87,8 +88,8 @@ namespace Unity.ProjectAuditor.Editor.UI.Framework
             foreach (var name in groupNames)
             {
                 // if necessary, create a group
-                if (!m_TreeViewItemGroups.Exists(g => g.GroupName.Equals(name)))
-                    m_TreeViewItemGroups.Add((new IssueTableItem(m_NextId++, 0, name)));
+                if (!m_TreeViewItemGroupsLookup.ContainsKey(name))
+                    m_TreeViewItemGroupsLookup[name] = new IssueTableItem(m_NextId++, 0, name);
             }
 
             var items = new Dictionary<int, IssueTableItem>(issues.Count);
@@ -123,7 +124,7 @@ namespace Unity.ProjectAuditor.Editor.UI.Framework
         public void Clear()
         {
             m_NextId = k_FirstId;
-            m_TreeViewItemGroups.Clear();
+            m_TreeViewItemGroupsLookup.Clear();
             m_TreeViewItemIssues = new Dictionary<int, IssueTableItem>();
             ClearSelection();
         }
@@ -134,13 +135,16 @@ namespace Unity.ProjectAuditor.Editor.UI.Framework
             var depthForHiddenRoot = -1;
             var root = new TreeViewItem(idForHiddenRoot, depthForHiddenRoot, "root");
 
-            foreach (var item in m_TreeViewItemGroups)
+            foreach (var item in m_TreeViewItemGroupsLookup.Values)
             {
                 root.AddChild(item);
             }
 
             return root;
         }
+
+        Dictionary<string, List<IssueTableItem>> groupNameItemLookup = new Dictionary<string, List<IssueTableItem>>();
+        Dictionary<string, List<IssueTableItem>> groupNameItemLookupIgnored = new Dictionary<string, List<IssueTableItem>>();
 
         protected override IList<TreeViewItem> BuildRows(TreeViewItem root)
         {
@@ -159,7 +163,7 @@ namespace Unity.ProjectAuditor.Editor.UI.Framework
                 return m_Rows;
             }
 
-            foreach (var group in m_TreeViewItemGroups)
+            foreach (var group in m_TreeViewItemGroupsLookup.Values)
             {
                 if (group.children != null)
                     group.children.Clear();
@@ -169,29 +173,65 @@ namespace Unity.ProjectAuditor.Editor.UI.Framework
             if (!hasSearch && !m_FlatView)
             {
                 var groupedItemQuery = allIssues.GroupBy(i => i.Value.ReportItem.GetPropertyGroup(m_Layout.Properties[groupPropertyIndex]));
+
+                groupNameItemLookup.Clear();
+                groupNameItemLookupIgnored.Clear();
+
+                foreach (var filteredItem in filteredItems)
+                {
+                    string filteredItemName = filteredItem.Value.GroupName;
+                    if (!groupNameItemLookup.ContainsKey(filteredItemName))
+                    {
+                        groupNameItemLookup[filteredItemName] = new List<IssueTableItem>();
+                    }
+
+                    groupNameItemLookup[filteredItemName].Add(filteredItem.Value);
+                }
+
+                foreach (var issue in allIssues)
+                {
+                    string filteredItemName = issue.Value.GroupName;
+                    if (!groupNameItemLookupIgnored.ContainsKey(filteredItemName))
+                    {
+                        groupNameItemLookupIgnored[filteredItemName] = new List<IssueTableItem>();
+                    }
+
+                    if (issue.Value.ReportItem.IsIgnored)
+                        groupNameItemLookupIgnored[filteredItemName].Add(issue.Value);
+                }
+
                 foreach (var groupedItems in groupedItemQuery)
                 {
                     var groupName = groupedItems.Key;
-                    var group = m_TreeViewItemGroups.Find(g => g.GroupName.Equals(groupName));
-                    var children = filteredItems.Where(item => item.Value.GroupName.Equals(groupName));
-                    var ignored_children = allIssues.Where(item => item.Value.GroupName.Equals(groupName) && item.Value.ReportItem.IsIgnored);
+                    var group = m_TreeViewItemGroupsLookup[groupName];
 
-                    if (children.Count() == 0 && ignored_children.Count() == 0)
+                    List<IssueTableItem> children = null;
+                    if (!groupNameItemLookup.TryGetValue(groupName, out children))
+                        children = new List<IssueTableItem>();
+
+                    List<IssueTableItem> ignored_children = null;
+                    int ignoredChildrenCount = 0;
+                    if (groupNameItemLookupIgnored.TryGetValue(groupName, out ignored_children))
+                        ignoredChildrenCount = ignored_children.Count();
+
+                    int childrenCount = children.Count();
+
+                    if (childrenCount == 0 && ignoredChildrenCount == 0)
                         continue;
 
                     m_Rows.Add(group);
 
                     var groupIsExpanded = state.expandedIDs.Contains(group.id);
 
-                    group.NumVisibleChildren = children.Count();
-                    group.NumIgnoredChildren = ignored_children.Count();
+                    group.NumVisibleChildren = childrenCount;
+                    group.NumIgnoredChildren = ignoredChildrenCount;
                     group.DisplayName = groupName;
 
                     foreach (var child in children)
                     {
                         if (groupIsExpanded)
-                            m_Rows.Add(child.Value);
-                        group.AddChild(child.Value);
+                            m_Rows.Add(child);
+                        group.AddChild(child);
                     }
                 }
             }
@@ -199,7 +239,7 @@ namespace Unity.ProjectAuditor.Editor.UI.Framework
             {
                 foreach (var item in filteredItems)
                 {
-                    var group = m_TreeViewItemGroups.Find(g => g.GroupName.Equals(item.Value.GroupName));
+                    var group = m_TreeViewItemGroupsLookup[item.Value.GroupName];
                     group.AddChild(item.Value);
 
                     m_Rows.Add(item.Value);

@@ -367,10 +367,19 @@ namespace Unity.ProjectAuditor.Editor.UI.Framework
             m_Dirty = false;
         }
 
+        private bool cacheDiagnosticProperty = true;
+        private bool diagnosticResult = false;
+
         // TODO: remove this method when not used anymore
         public bool IsDiagnostic()
         {
-            return m_Layout.Properties.Any(p => p.Type == PropertyType.Severity);
+            if (cacheDiagnosticProperty)
+            {
+                diagnosticResult = m_Layout.Properties.Any(p => p.Type == PropertyType.Severity);
+                cacheDiagnosticProperty = false;
+            }
+
+            return diagnosticResult;
         }
 
         public bool IsValid()

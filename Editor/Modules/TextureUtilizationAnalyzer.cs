@@ -52,7 +52,7 @@ namespace Unity.ProjectAuditor.Editor.Modules
             MessageFormat = "Texture Atlas '{0}' has too much empty space ({1})"
         };
 
-        [DiagnosticParameter("TextureEmptySpaceLimit", "Empty Texture Atlas use threshold (percentage)", "Warn if the percentage of unused pixels in a Texture Atlas is greater than this threshold.", 50)]
+        //[DiagnosticParameter("TextureEmptySpaceLimit", "Empty Texture Atlas use threshold (percentage)", "Warn if the percentage of unused pixels in a Texture Atlas is greater than this threshold.", 50)]
         int m_EmptySpaceLimit;
 
         public override void Initialize(Action<Descriptor> registerDescriptor)

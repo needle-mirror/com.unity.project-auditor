@@ -233,16 +233,16 @@ namespace Unity.ProjectAuditor.Editor.Modules
             MessageFormat = "AudioClip '{0}' source asset is in a lossy compressed format",
         };
 
-        [DiagnosticParameter("StreamingClipThresholdBytes", "Streaming Audio Clip Threshold (Bytes)", "Maximum size a non-streaming audio clip can be in Bytes before an Issue is created.", 1 * (64000 + (int)(1.6 * 48000 * 2)) + 694)]
+        [DiagnosticParameter("StreamingClipThresholdBytes", "Streaming Audio Clip Threshold (Bytes)", "Issues will be raised if (a) clips larger than this are not streaming and (b) clips smaller than this are streaming.  'Runtime Size (Estimate)' is used for this comparison.", 1 * (64000 + (int)(1.6 * 48000 * 2)) + 694)]
         int m_StreamingClipThresholdBytes;
 
-        [DiagnosticParameter("LongDecompressedClipThresholdBytes","Decompressed Audio Clip Threshold (Bytes)", "Maximum size a decompressed audio clip can be in Bytes before an Issue is created.", 200 * 1024)]
+        [DiagnosticParameter("LongDecompressedClipThresholdBytes","Decompressed Audio Clip Threshold (Bytes)", "Maximum 'Runtime Size (Estimate)' of a decompressed audio clip (in Bytes) before an Issue is created.", 200 * 1024)]
         int m_LongDecompressedClipThresholdBytes;
 
-        [DiagnosticParameter("LongCompressedMobileClipThresholdBytes","Compressed Audio Clip Threshold (Bytes)", "Maximum size a compressed audio clip can be in Bytes before an Issue is created (on mobile devices).", 200 * 1024)]
+        [DiagnosticParameter("LongCompressedMobileClipThresholdBytes","Compressed Audio Clip Threshold (Bytes)", "Maximum 'Imported File Size' of a compressed audio clip (in Bytes) before an Issue is created (on mobile devices).", 200 * 1024)]
         int m_LongCompressedMobileClipThresholdBytes;
 
-        [DiagnosticParameter("LoadInBackGroundClipSizeThresholdBytes","Load In Background Audio Clip Threshold (Bytes)", "Maximum size a 'Load In Background' audio clip can be in Bytes before an Issue is created.", 200 * 1024)]
+        [DiagnosticParameter("LoadInBackGroundClipSizeThresholdBytes","Load In Background Audio Clip Threshold (Bytes)", "Maximum 'Imported File Size' of a 'Load In Background' audio clip (in Bytes) before an Issue is created.", 200 * 1024)]
         int m_LoadInBackGroundClipSizeThresholdBytes;
 
         public override void Initialize(Action<Descriptor> registerDescriptor)

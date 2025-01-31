@@ -32,8 +32,7 @@ namespace Unity.ProjectAuditor.Editor.Core
         /// To speed up the code analysis process, each CodeModuleInstructionAnalyzer must provide a list of the
         /// Instruction OpCodes it's interested in. Project Auditor will only invoke an InstructionAnalyzer if the
         /// OpCode of the Instruction currently under analysis matches one of the OpCodes in this list. For more
-        /// details, see the following Mono.Cecil github page:
-        /// <see cref="https://github.com/jbevain/cecil/blob/master/Mono.Cecil.Cil/OpCodes.cs"/>.
+        /// details, refer to the [Mono.Cecil Github page](https://github.com/jbevain/cecil/blob/master/Mono.Cecil.Cil/OpCodes.cs).
         /// </remarks>
         public abstract IReadOnlyCollection<OpCode> opCodes { get; }
 

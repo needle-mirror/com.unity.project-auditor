@@ -257,8 +257,7 @@ namespace Unity.ProjectAuditor.Editor.Modules
             k_ShaderVariantLayout,
             k_ComputeShaderVariantLayout,
             k_ShaderCompilerMessageLayout,
-            k_MaterialLayout,
-            AssetsModule.k_IssueLayout
+            k_MaterialLayout
         };
 
         public override AnalysisResult Audit(AnalysisParams analysisParams, IProgress progress = null)

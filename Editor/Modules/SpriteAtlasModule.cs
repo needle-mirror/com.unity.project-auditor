@@ -184,20 +184,34 @@ namespace Unity.ProjectAuditor.Editor.Modules
                     reportedFreeSpace = "Analysis disabled, SpriteAtlasEmptySpaceLimit is set to 100";
                 else
                 {
-                    var texture = context.SpriteAtlas.spriteCount > 0 ? TextureUtils.GetPreviewTexture(context.SpriteAtlas) : null;
-                    if (texture != null)
-                        mainTextureResolution = texture.width + "x" + texture.height;
-
-                    context.EmptySpacePercentage = TextureUtils.GetEmptyPixelsPercent(texture);
-
-                    if (context.EmptySpacePercentage < 0)
-                    {
-                        Debug.LogError($"Error analysing texture \"{texture.name}\" in sprite atlas \"{context.SpriteAtlas.name}\"");
-                        reportedFreeSpace = "Error";
-                    }
+                    if (context.SpriteAtlas.spriteCount == 0)
+                        reportedFreeSpace = "No sprites found";
                     else
                     {
-                        reportedFreeSpace = $"{context.EmptySpacePercentage}%";
+                        var previewTexture = TextureUtils.GetPreviewTexture(context.SpriteAtlas);
+
+                        if (previewTexture == null)
+                        {
+                            Debug.LogError($"Error getting preview image for sprite atlas \"{context.SpriteAtlas.name}\"");
+                            reportedFreeSpace = "Error";
+                        }
+                        else
+                        {
+                            mainTextureResolution = previewTexture.width + "x" + previewTexture.height;
+
+                            context.EmptySpacePercentage = TextureUtils.GetEmptyPixelsPercent(previewTexture);
+
+                            if (context.EmptySpacePercentage < 0)
+                            {
+                                Debug.LogError(
+                                    $"Error analysing texture \"{previewTexture.name}\" in sprite atlas \"{context.SpriteAtlas.name}\"");
+                                reportedFreeSpace = "Error";
+                            }
+                            else
+                            {
+                                reportedFreeSpace = $"{context.EmptySpacePercentage}%";
+                            }
+                        }
                     }
                 }
 

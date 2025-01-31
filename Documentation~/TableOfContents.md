@@ -1,43 +1,19 @@
-* [Index](./index.md)
-* [Installing](./Installing.md)
-* [Getting started](./GettingStarted.md)
-* [Configuring Project Auditor analysis](Configuration.md)
-* Welcome/Summary
-  * [Welcome View](WelcomeView.md)
-  * [Summary View](SummaryView.md)
-* Code
-  * [Code Issues](CodeIssues.md)
-  * [Assemblies](CodeAssemblies.md)
-  * [C# Compiler Messages](CodeCompilerMessages.md)
-  * [Domain Reload](CodeDomainReload.md)
-* Assets
-  * [Assets Issues](AssetsIssues.md)
-  * [Textures](AssetsTextures.md)
-  * [Meshes](AssetsMeshes.md)
-  * [AudioClips](AssetsAudioClips.md)
-  * [Animator Controllers](AssetsAnimatorControllers.md)
-  * [Animation Clips](AssetsAnimationClips.md)
-  * [Avatars](AssetsAvatars.md)
-  * [Avatar Masks](AssetsAvatarMasks.md)
-* Shaders
-  * [Shaders](Shaders.md)
-  * [Shader Variants](ShadersVariants.md)
-  * [Compute Shader Variants](ShadersComputeVariants.md)
-  * [Compiler Messages](ShadersCompilerMessages.md)
-  * [Materials](ShadersMaterials.md)
-* Project
-  * [Project Settings](ProjectSettings.md)
-* Build
-  * [Build Size](BuildSize.md)
-  * [Build Steps](BuildSteps.md)
-* Scripting
-  * [Scripting API Overview](./API.md)
-  * [Creating Custom Analyzers](./APICustomAnalyzers.md)
-* [Glossary](./Glossary.md)
-
-
-
-
-
-
-
+* [Project Auditor package](index.md)
+* [Project Auditor introduction](project-auditor-introduction.md)
+* [Analyze your project](analyze-project.md)
+* [Project issues](project-issues.md)
+  * [Project issues introduction](project-issues-introduction.md)
+  * [Domain reloading](domain-reloading-issues.md)
+* [Programming with Project Auditor](project-auditor-programming.md)
+  * [Run Project Auditor from the command line](run-from-command-line.md)
+  * [Compare issues and insights](compare-issues.md)
+  * [Create custom analyzers](custom-analyzers.md)
+* [Project Auditor window reference](project-auditor-window.md)
+  * [Project Auditor window reference overview](project-auditor-window-reference.md)
+  * [Summary view reference](summary-view-reference.md)
+  * [Code view reference](code-view-reference.md)
+  * [Assets view reference](assets-view-reference.md)
+  * [Shaders view reference](shaders-view-reference.md)
+  * [Project view reference](project-view-reference.md)
+  * [Build view reference](build-view-reference.md)
+* [Project Auditor settings reference](project-auditor-settings-reference.md)

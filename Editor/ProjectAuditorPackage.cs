@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using Unity.ProjectAuditor.Editor.Utils;
 using UnityEditor;
 using UnityEditor.PackageManager;

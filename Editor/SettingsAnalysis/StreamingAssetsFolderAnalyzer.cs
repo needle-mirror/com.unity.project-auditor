@@ -23,7 +23,7 @@ namespace Unity.ProjectAuditor.Editor.SettingsAnalysis
             MessageFormat = "StreamingAssets folder contains {0} of data",
         };
 
-        [DiagnosticParameter("StreamingAssetsFolderSizeLimit", "StreamingAssets folder size limit (MB)", "If the StreamingAssets folder is larger than this threshold an Issue will be created.", 50)]
+        [DiagnosticParameter("StreamingAssetsFolderSizeLimit", "StreamingAssets folder size limit (MB)", "If the StreamingAssets folder is larger than this threshold an Issue will be created (on mobile devices).", 50)]
         int m_FolderSizeLimit;
 
         public override void Initialize(Action<Descriptor> registerDescriptor)

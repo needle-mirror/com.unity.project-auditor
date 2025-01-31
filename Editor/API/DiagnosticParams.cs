@@ -29,13 +29,13 @@ namespace Unity.ProjectAuditor.Editor
         internal class PlatformParams
         {
             [JsonIgnore]
-            public BuildTarget Platform;
+            public BuildTargetGroup PlatformGroup;
 
-            [JsonProperty("platform")]
+            [JsonProperty("platformgroup")]
             string PlatformString
             {
-                get => Platform.ToString();
-                set => Platform = (BuildTarget)Enum.Parse(typeof(BuildTarget), value);
+                get => PlatformGroup.ToString();
+                set => PlatformGroup = (BuildTargetGroup)Enum.Parse(typeof(BuildTargetGroup), value);
             }
 
             // A string-keyed Dictionary is not a particularly efficient data structure. However:
@@ -64,7 +64,6 @@ namespace Unity.ProjectAuditor.Editor
             [NonReorderable][JsonIgnore][SerializeField]
             List<ParamKeyValue> m_SerializedParams = new List<ParamKeyValue>();
 
-            private bool showPlatform = true;
             public void DoGUI()
             {
                 String[] keys = m_Params.Keys.ToArray();
@@ -79,7 +78,7 @@ namespace Unity.ProjectAuditor.Editor
                 EditorGUI.indentLevel++;
                 var plaformString = PlatformString == "NoTarget"
                     ? "Default"
-                    : Utils.Formatting.GetModernBuildTargetName(Platform);
+                    : Utils.Formatting.GetModernBuildTargetName(PlatformGroup);
                 EditorGUILayout.LabelField(plaformString, EditorStyles.boldLabel);
                 EditorGUI.indentLevel++;
                 foreach (var key in keys)
@@ -116,14 +115,14 @@ namespace Unity.ProjectAuditor.Editor
             {
             }
 
-            public PlatformParams(BuildTarget platform) : this()
+            public PlatformParams(BuildTargetGroup platformGroup) : this()
             {
-                Platform = platform;
+                PlatformGroup = platformGroup;
             }
 
             public PlatformParams(PlatformParams copyFrom) : this()
             {
-                Platform = copyFrom.Platform;
+                PlatformGroup = copyFrom.PlatformGroup;
 
                 foreach (var key in copyFrom.m_Params.Keys)
                 {
@@ -139,6 +138,11 @@ namespace Unity.ProjectAuditor.Editor
             public void SetParameter(string paramName, int paramValue)
             {
                 m_Params[paramName] = paramValue;
+            }
+
+            internal void RemoveParameter(string paramName)
+            {
+                m_Params.Remove(paramName);
             }
 
             public void PreSerialize()
@@ -180,8 +184,8 @@ namespace Unity.ProjectAuditor.Editor
         /// </summary>
         public DiagnosticParams()
         {
-            // We treat BuildTarget.NoTarget as the default value fallback if there isn't a platform-specific override
-            m_ParamsStack.Add(new PlatformParams(BuildTarget.NoTarget));
+            // We treat BuildTargetGroup.Unknown as the default value fallback if there isn't a platform-specific override
+            m_ParamsStack.Add(new PlatformParams(BuildTargetGroup.Unknown));
         }
 
         private void InitPlatformParams()
@@ -189,25 +193,29 @@ namespace Unity.ProjectAuditor.Editor
             var buildTargets = Enum.GetValues(typeof(BuildTarget)).Cast<BuildTarget>();
             var supportedBuildTargets = buildTargets.Where(bt =>
                 BuildPipeline.IsBuildTargetSupported(BuildPipeline.GetBuildTargetGroup(bt), bt)).ToList();
-            supportedBuildTargets.Sort((t1, t2) =>
+            var supportedGroups  = new HashSet<BuildTargetGroup>();
+            foreach (var buildTarget in supportedBuildTargets)
+                supportedGroups.Add(BuildPipeline.GetBuildTargetGroup(buildTarget));
+            var supportedBTGroups = supportedGroups.ToList();
+            supportedBTGroups.Sort((t1, t2) =>
                 String.Compare(t1.ToString(), t2.ToString(), StringComparison.Ordinal));
 
             // Add at the beginning of the list, after sorting the other options
-            supportedBuildTargets.Insert(0, BuildTarget.NoTarget);
+            supportedBTGroups.Insert(0, BuildTargetGroup.Unknown);
 
-            foreach (var target in supportedBuildTargets)
+            foreach (var target in supportedBTGroups)
             {
                 bool found = false;
                 foreach (var platformParams in m_ParamsStack)
                 {
-                    if (platformParams.Platform == target)
+                    if (platformParams.PlatformGroup == target)
                         found = true;
                 }
 
                 if (!found)
                 {
                     PlatformParams newPlatform = new PlatformParams(m_ParamsStack[0]);
-                    newPlatform.Platform = target;
+                    newPlatform.PlatformGroup = target;
                     m_ParamsStack.Add(newPlatform);
                 }
             }
@@ -233,7 +241,7 @@ namespace Unity.ProjectAuditor.Editor
         {
             foreach (var platformParams in m_ParamsStack)
             {
-                if (BuildPipeline.GetBuildTargetGroup(platformParams.Platform) == btg)
+                if (platformParams.PlatformGroup == btg)
                 {
                     platformParams.DoGUI();
                     return;
@@ -253,7 +261,7 @@ namespace Unity.ProjectAuditor.Editor
 
             for (int i = 0; i < m_ParamsStack.Count; ++i)
             {
-                if (m_ParamsStack[i].Platform == platform)
+                if (m_ParamsStack[i].PlatformGroup == BuildPipeline.GetBuildTargetGroup(platform))
                 {
                     CurrentParamsIndex = i;
                     return;
@@ -261,7 +269,7 @@ namespace Unity.ProjectAuditor.Editor
             }
 
             // We didn't find this platform in the platform stack yet, so let's create it.
-            m_ParamsStack.Add(new PlatformParams(platform));
+            m_ParamsStack.Add(new PlatformParams(BuildPipeline.GetBuildTargetGroup(platform)));
             CurrentParamsIndex = m_ParamsStack.Count - 1;
         }
 
@@ -317,11 +325,11 @@ namespace Unity.ProjectAuditor.Editor
         /// <param name="tooltip">Text to show on a tooltip in project settings.</param>
         /// <param name="value">Value to set the parameter to.</param>
         /// <param name="platform">Analysis target platform for which to set the value. Defaults to BuildTarget.NoTarget which sets the value for the default platform.</param>
-        public void SetParameter(string paramName, string userFriendlyName, string tooltip, int value, BuildTarget platform = BuildTarget.NoTarget)
+        public void SetParameter(string paramName, string userFriendlyName, string tooltip, int value, BuildTargetGroup platform = BuildTargetGroup.Unknown)
         {
             foreach (var platformParams in m_ParamsStack)
             {
-                if (platformParams.Platform == platform)
+                if (platformParams.PlatformGroup == platform)
                 {
                     platformParams.SetParameter(paramName, value);
                     return;
@@ -408,7 +416,7 @@ namespace Unity.ProjectAuditor.Editor
 
         internal void RegisterParameters()
         {
-            m_ParamsStack[0].Platform = BuildTarget.NoTarget;
+            m_ParamsStack[0].PlatformGroup = BuildTargetGroup.Unknown;
             foreach (var type in TypeCache.GetTypesDerivedFrom(typeof(ModuleAnalyzer)))
             {
                 if (type.IsAbstract)
@@ -425,12 +433,48 @@ namespace Unity.ProjectAuditor.Editor
             if (m_ParamsStack == null || m_ParamsStack.Count == 0)
             {
                 m_ParamsStack = new List<PlatformParams>();
-                m_ParamsStack.Add(new PlatformParams(BuildTarget.NoTarget));
+                m_ParamsStack.Add(new PlatformParams(BuildTargetGroup.Unknown));
             }
 
             if (m_ParamsStack[0].ParamsCount == 0)
             {
                 RegisterParameters();
+            }
+
+            if (m_ParamsStack.Count > 1)
+            {
+                // When adding a new DiagnosticParameter, the default will be registered, but any further serialized
+                // PlatformParams need to have some manual intervention to apply the addition.
+                // All keys should exist for all PlatformParams, so we just need to work out the difference once.
+                var keysDefault = m_ParamsStack[0].GetKeys();
+                var keysFirstNonDefault = m_ParamsStack[1].GetKeys();
+
+                var keysThatNeedAdding = keysDefault.Except(keysFirstNonDefault).ToList();
+                if (keysThatNeedAdding.Any())
+                {
+                    for (var i = 1; i < m_ParamsStack.Count; ++i)
+                    {
+                        foreach (var key in keysThatNeedAdding)
+                            m_ParamsStack[i].SetParameter(key, ProjectAuditorSettings.instance.DiagnosticParams.GetDefault(key));
+                    }
+                }
+            }
+
+            // Next, we need to remove any params that are no longer registered, but remain in serialized data.
+            // Make use of the fact that tooltips aren't serialized to see what should stay.
+            if (m_Tooltips.Any())
+            {
+                var keysThatNeedRemoving = m_ParamsStack[0].GetKeys().Except(m_Tooltips.Keys).ToList();
+                var numKeysToRemove = keysThatNeedRemoving.Count;
+
+                if (numKeysToRemove > 0)
+                {
+                    foreach (var platformParams in m_ParamsStack)
+                    {
+                        foreach (var key in keysThatNeedRemoving)
+                            platformParams.RemoveParameter(key);
+                    }
+                }
             }
         }
 
@@ -438,7 +482,7 @@ namespace Unity.ProjectAuditor.Editor
         internal void ClearAllParameters()
         {
             m_ParamsStack.Clear();
-            m_ParamsStack.Add(new PlatformParams(BuildTarget.NoTarget));
+            m_ParamsStack.Add(new PlatformParams(BuildTargetGroup.Unknown));
         }
 
         // For testing purposes only

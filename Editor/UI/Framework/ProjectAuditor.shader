@@ -1,4 +1,4 @@
-﻿Shader "Unlit/ProjectAuditor"
+Shader "Unlit/ProjectAuditor"
 {
     Properties
     {
