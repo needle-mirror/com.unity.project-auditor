@@ -4,13 +4,13 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## [1.0.0-pre.7] - 2025-01-31
-
-### Added
+## [1.0.0] - 2025-02-05
 
 ### Changed
+* Version number bumped to 1.0.0 for release.
+* Added QAReport.md.
 
-### Removed
+## [1.0.0-pre.7] - 2025-01-31
 
 ### Fixed
 * Fix for COPT-3333; have the Assembly view always deal in milliseconds for time values to help with eg. consistency in exported data.
