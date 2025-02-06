@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Unity.ProjectAuditor.Editor.Core;
@@ -22,11 +23,23 @@ namespace Unity.ProjectAuditor.Editor.UI.Framework
         public override void DrawDetails(ReportItem[] selectedIssues)
         {
             Descriptor descriptor = null;
-            var selectedIDs = selectedIssues.Select(i => i.Id).Distinct().ToArray();
-            var numSelectedIDs = selectedIDs.Length;
-            if (numSelectedIDs > 0)
+            Dictionary<DescriptorId, bool> dict = new Dictionary<DescriptorId, bool>();
+            foreach (var issue in selectedIssues)
             {
-                descriptor = selectedIDs[0].GetDescriptor();
+                dict[issue.Id] = true;
+
+                if (dict.Count() > 1)
+                    break;
+            }
+
+            var numSelectedIDs = dict.Count();
+            bool noSelectedIDs = numSelectedIDs == 0;
+            bool oneSelectedID = numSelectedIDs == 1;
+            bool anySelectedIDs = numSelectedIDs > 0;
+            bool multipleSelectedIDs = numSelectedIDs > 1;
+            if (anySelectedIDs)
+            {
+                descriptor = selectedIssues[0].Id.GetDescriptor();
             }
 
             EditorGUILayout.BeginVertical(GUILayout.Width(LayoutSize.FoldoutWidth));
@@ -35,7 +48,7 @@ namespace Unity.ProjectAuditor.Editor.UI.Framework
             {
                 EditorGUILayout.LabelField(Contents.Details, SharedStyles.BoldLabel);
                 {
-                    if (numSelectedIDs != 0)
+                    if (anySelectedIDs)
                     {
                         if (GUILayout.Button(Contents.CopyToClipboard, SharedStyles.TabButton,
                             GUILayout.Width(LayoutSize.CopyToClipboardButtonSize),
@@ -50,10 +63,10 @@ namespace Unity.ProjectAuditor.Editor.UI.Framework
             m_DetailsScrollPos =
                 EditorGUILayout.BeginScrollView(m_DetailsScrollPos, GUILayout.ExpandHeight(true));
 
-            if (numSelectedIDs == 0)
+            if (noSelectedIDs)
                 GUILayout.TextArea(k_NoSelectionText, SharedStyles.TextAreaWithDynamicSize,
                     GUILayout.MaxHeight(LayoutSize.FoldoutMaxHeight));
-            else if (numSelectedIDs > 1)
+            else if (multipleSelectedIDs)
                 GUILayout.TextArea(k_MultipleSelectionText, SharedStyles.TextAreaWithDynamicSize,
                     GUILayout.MaxHeight(LayoutSize.FoldoutMaxHeight));
             else
@@ -71,7 +84,7 @@ namespace Unity.ProjectAuditor.Editor.UI.Framework
             {
                 EditorGUILayout.LabelField(Contents.Recommendation, SharedStyles.BoldLabel);
                 {
-                    if (numSelectedIDs != 0)
+                    if (anySelectedIDs)
                     {
                         if (GUILayout.Button(Contents.CopyToClipboard, SharedStyles.TabButton,
                             GUILayout.Width(LayoutSize.CopyToClipboardButtonSize),
@@ -86,10 +99,10 @@ namespace Unity.ProjectAuditor.Editor.UI.Framework
             m_RecommendationScrollPos =
                 EditorGUILayout.BeginScrollView(m_RecommendationScrollPos, GUILayout.ExpandHeight(true));
 
-            if (numSelectedIDs == 0)
+            if (noSelectedIDs)
                 GUILayout.TextArea(k_NoSelectionText, SharedStyles.TextAreaWithDynamicSize,
                     GUILayout.MaxHeight(LayoutSize.FoldoutMaxHeight));
-            else if (numSelectedIDs > 1)
+            else if (multipleSelectedIDs)
                 GUILayout.TextArea(k_MultipleSelectionText, SharedStyles.TextAreaWithDynamicSize,
                     GUILayout.MaxHeight(LayoutSize.FoldoutMaxHeight));
             else
@@ -101,7 +114,7 @@ namespace Unity.ProjectAuditor.Editor.UI.Framework
             EditorGUILayout.EndScrollView();
 
             var issuesAreIgnored = AreIssuesIgnored(selectedIssues);
-            if (numSelectedIDs == 1)
+            if (oneSelectedID)
             {
                 if (!string.IsNullOrEmpty(descriptor.DocumentationUrl))
                 {

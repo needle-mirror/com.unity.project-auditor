@@ -82,6 +82,7 @@ To view Roslyn Analyzer diagnostics, make sure Roslyn Analyzer DLLs use the <b>R
         {
             switch (issue.Severity)
             {
+                default:
                 case Severity.Info:
                     if (!m_ShowInfo)
                         return false;

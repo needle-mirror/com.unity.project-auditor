@@ -139,7 +139,7 @@ namespace Unity.ProjectAuditor.Editor.UI.Framework
                 };
             }
 
-            var multiColumnHeader = new MultiColumnHeader(new MultiColumnHeaderState(columns));
+            var multiColumnHeader = new PAMultiColumnHeader(new MultiColumnHeaderState(columns));
 
             // set default sorting column (priority: Severity/logLevel, description or first column)
             multiColumnHeader.SetSorting(m_SortPropertyIndex != -1 ? m_SortPropertyIndex : 0, m_SortAscending);
@@ -202,6 +202,7 @@ namespace Unity.ProjectAuditor.Editor.UI.Framework
                 if (property.IsHidden)
                 {
                     header.GetColumn(columnIndex).width = 0;
+                    header.GetColumn(columnIndex).allowToggleVisibility = false;
                     continue;
                 }
 
@@ -393,9 +394,6 @@ namespace Unity.ProjectAuditor.Editor.UI.Framework
 
         public virtual void DrawContent(bool showDetails = false)
         {
-            var selectedItems = m_Table.GetSelectedItems();
-            var selectedIssues = selectedItems.Where(i => i.ReportItem != null).Select(i => i.ReportItem).ToArray();
-
             using (new EditorGUILayout.HorizontalScope(GUI.skin.box, GUILayout.ExpandHeight(true)))
             {
                 DrawTable();
@@ -408,6 +406,7 @@ namespace Unity.ProjectAuditor.Editor.UI.Framework
                     EditorGUILayout.Space();
                     EditorGUILayout.EndHorizontal();
 
+                    var selectedIssues = GetSelection();
                     DrawDetails(selectedIssues);
                     EditorGUILayout.EndVertical();
                 }
@@ -415,6 +414,7 @@ namespace Unity.ProjectAuditor.Editor.UI.Framework
 
             if (m_Desc.ShowDependencyView)
             {
+                var selectedIssues = GetSelection();
                 DrawDependencyView(selectedIssues);
             }
         }
@@ -655,10 +655,15 @@ namespace Unity.ProjectAuditor.Editor.UI.Framework
                 m_TextFilter.searchString = filter;
         }
 
-        public ReportItem[] GetSelection()
+        public int GetSelectionCount()
         {
             var selectedItems = m_Table.GetSelectedItems();
-            return selectedItems.Where(item => item.parent != null).Select(i => i.ReportItem).ToArray();
+            return selectedItems.Count();
+        }
+
+        public ReportItem[] GetSelection()
+        {
+            return m_Table.GetSelectedReportItems();
         }
 
         public void SetSelection(Func<ReportItem, bool> predicate)

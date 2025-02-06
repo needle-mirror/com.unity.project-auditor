@@ -11,6 +11,31 @@ using UnityEngine.Profiling;
 
 namespace Unity.ProjectAuditor.Editor.UI.Framework
 {
+    class PAMultiColumnHeader : MultiColumnHeader
+    {
+        public PAMultiColumnHeader(MultiColumnHeaderState state) : base(state)
+        {
+        }
+
+        private void MyToggleVisibility(object userData)
+        {
+            this.ToggleVisibility((int)userData);
+        }
+
+        protected override void AddColumnHeaderContextMenuItems(GenericMenu menu)
+        {
+            menu.AddItem(EditorGUIUtility.TrTextContent("Resize to Fit"), false, new GenericMenu.MenuFunction(this.ResizeToFit));
+            menu.AddSeparator("");
+            for (int userData = 0; userData < this.state.columns.Length; ++userData)
+            {
+                MultiColumnHeaderState.Column column = this.state.columns[userData];
+                string text = !string.IsNullOrEmpty(column.contextMenuText) ? column.contextMenuText : column.headerContent.text;
+                if (column.allowToggleVisibility)
+                    menu.AddItem(new GUIContent(text), ((IEnumerable<int>) this.state.visibleColumns).Contains<int>(userData), new GenericMenu.MenuFunction2(this.MyToggleVisibility), (object) userData);
+            }
+        }
+    }
+
     class IssueTable : TreeView
     {
         static readonly int k_DefaultRowHeight = 18;
@@ -26,7 +51,9 @@ namespace Unity.ProjectAuditor.Editor.UI.Framework
             m_TreeViewItemGroupsLookup = new Dictionary<string, IssueTableItem>();
         Dictionary<int, IssueTableItem> m_TreeViewItemIssues;
         List<IssueTableItem> m_SelectedIssues = new List<IssueTableItem>();
+        ReportItem[] m_SelectedReportItems;
         bool m_SelectionChanged = true;
+        bool m_SelectionChangedReportItems = true;
         int m_NextId;
         int m_NumMatchingIssues;
         bool m_FlatView;
@@ -354,7 +381,7 @@ namespace Unity.ProjectAuditor.Editor.UI.Framework
 
                     if (showIgnoredIssues)
                     {
-                        string label = item.NumIgnoredChildren > 0 ? $"({item.NumVisibleChildren} Items, including {item.NumIgnoredChildren} Ignored)" : $"({item.NumVisibleChildren} Items)";
+                        string label = item.NumIgnoredChildren > 0 ? $"({item.NumVisibleChildren} Item(s), including {item.NumIgnoredChildren} Ignored)" : $"({item.NumVisibleChildren} Item(s))";
                         EditorGUI.LabelField(new Rect(cellRect)
                         {
                             x = labelStyle.CalcSize(guiContent).x + contentIndent
@@ -362,7 +389,7 @@ namespace Unity.ProjectAuditor.Editor.UI.Framework
                     }
                     else
                     {
-                        string label = item.NumIgnoredChildren > 0 ? $"({item.NumVisibleChildren} Items, {item.NumIgnoredChildren} Ignored are hidden)" : $"({item.NumVisibleChildren} Items)";
+                        string label = item.NumIgnoredChildren > 0 ? $"({item.NumVisibleChildren} Item(s), {item.NumIgnoredChildren} Ignored and hidden)" : $"({item.NumVisibleChildren} Item(s))";
                         EditorGUI.LabelField(new Rect(cellRect)
                         {
                             x = labelStyle.CalcSize(guiContent).x + contentIndent
@@ -562,6 +589,21 @@ namespace Unity.ProjectAuditor.Editor.UI.Framework
             return ignored_children.Count();
         }
 
+        public ReportItem[] GetSelectedReportItems()
+        {
+            if (!m_SelectionChangedReportItems)
+            {
+                return m_SelectedReportItems;
+            }
+
+            m_SelectionChangedReportItems = false;
+
+            var selectedItems = GetSelectedItems();
+            m_SelectedReportItems = selectedItems.Where(item => item.parent != null).Select(i => i.ReportItem).ToArray();
+
+            return m_SelectedReportItems;
+        }
+
         public List<IssueTableItem> GetSelectedItems()
         {
             if (!m_SelectionChanged)
@@ -594,6 +636,7 @@ namespace Unity.ProjectAuditor.Editor.UI.Framework
         protected override void SelectionChanged(IList<int> selectedIds)
         {
             m_SelectionChanged = true;
+            m_SelectionChangedReportItems = true;
         }
 
         void OnSortingChanged(MultiColumnHeader _multiColumnHeader)
@@ -675,6 +718,7 @@ namespace Unity.ProjectAuditor.Editor.UI.Framework
             state.selectedIDs.Clear();
 
             m_SelectionChanged = true;
+            m_SelectionChangedReportItems = true;
         }
 
         void SortIfNeeded(IList<TreeViewItem> rows)

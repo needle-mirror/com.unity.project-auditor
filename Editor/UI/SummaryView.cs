@@ -327,7 +327,7 @@ namespace Unity.ProjectAuditor.Editor.UI
 
         void DrawIssueBreakdown()
         {
-	    GUILayout.Space(8);
+            GUILayout.Space(8);
 
             using (new EditorGUILayout.VerticalScope())
             {
@@ -814,7 +814,10 @@ namespace Unity.ProjectAuditor.Editor.UI
                     {
                         GUILayout.Space(20);
 
-                        GUILayout.Label($"No {title} issues have been found.");
+                        if (m_ViewManager.Report.HasCategory(category))
+                            GUILayout.Label($"No {title} issues have been found.");
+                        else
+                            GUILayout.Label($"{title} analysis is not yet included in this report.");
                     }
 
                     using (new EditorGUILayout.HorizontalScope())
@@ -883,19 +886,19 @@ namespace Unity.ProjectAuditor.Editor.UI
 
                 GUILayout.Space(20);
 
-		if (GUILayout.Button($"Go to {title}", GUILayout.Width(k_NavigationButtonWidth)))
-		{
-		    if (!m_ViewManager.Report.HasCategory(category))
-		    {
-			m_ProjectAuditorWindow.GotoNonAnalyzedCategory(category);
-		    }
-		    else
-		    {
-			m_ViewManager.ChangeView(category);
-		    }
+                if (GUILayout.Button($"Go to {title}", GUILayout.Width(k_NavigationButtonWidth)))
+                {
+                    if (!m_ViewManager.Report.HasCategory(category))
+                    {
+                        m_ProjectAuditorWindow.GotoNonAnalyzedCategory(category);
+                    }
+                    else
+                    {
+                        m_ViewManager.ChangeView(category);
+                    }
 
-		    GUIUtility.ExitGUI();
-		}
+                    GUIUtility.ExitGUI();
+                }
 
                 EditorGUILayout.EndHorizontal();
             }

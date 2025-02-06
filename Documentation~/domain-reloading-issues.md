@@ -19,7 +19,7 @@ Project Auditor raises warning diagnostics if any of the following criteria are 
 
 ## Display domain reload issues
 
-To display issues in the Domain Reload view, you need to enable the **Use Roslyn Analyzers** setting in the [Preferences window](project-auditor-settings-reference.md). The use of Roslyn analyzers can cause Project Auditor's analysis to take longer, so it's disabled by default. 
+To display issues in the Domain Reload view, you need to enable the **Use Roslyn Analyzers** setting in the [Preferences window](project-auditor-settings-reference.md). The use of Roslyn analyzers can cause Project Auditor's analysis to take longer, so it's disabled by default.
 
 To allow Project Auditor to use Roslyn analyzers:
 

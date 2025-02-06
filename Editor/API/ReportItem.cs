@@ -151,8 +151,12 @@ namespace Unity.ProjectAuditor.Editor
             {
                 if (cachedExtension == null)
                 {
-                    var extAIndex = PathUtils.GetExtensionIndexFromPath(RelativePath);
-                    cachedExtension = RelativePath.Substring(extAIndex + 1);
+                    string rp = RelativePath;
+                    var extAIndex = PathUtils.GetExtensionIndexFromPath(rp);
+                    if (extAIndex >= (rp.Length - 1))
+                        cachedExtension = "";
+                    else
+                        cachedExtension = rp.Substring(extAIndex + 1);
                 }
 
                 return cachedExtension;
@@ -212,7 +216,7 @@ namespace Unity.ProjectAuditor.Editor
         [JsonProperty("severity")]
         internal string SeverityAsString
         {
-            get => IsIssue() ? m_Severity.ToString() : null;
+            get => (IsIssue() || (m_Category == IssueCategory.BuildStep)) ? m_Severity.ToString() : null;
             set => m_Severity = (Severity)Enum.Parse(typeof(Severity), value);
         }
 

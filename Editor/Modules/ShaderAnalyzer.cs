@@ -34,6 +34,11 @@ namespace Unity.ProjectAuditor.Editor.Modules
                 yield break;
             }
 
+            if (context.Shader.name.StartsWith("Hidden/"))
+            {
+                yield break;
+            }
+
             var subShaderIndex = ShaderUtilProxy.GetShaderActiveSubshaderIndex(context.Shader);
             var isSrpBatchingCompatible = ShaderUtilProxy.GetSRPBatcherCompatibilityCode(context.Shader, subShaderIndex) == 0;
 

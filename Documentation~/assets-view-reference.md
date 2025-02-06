@@ -38,7 +38,7 @@ For Assets Issues relating to dependency chains, the Asset Dependencies panel at
 ## Textures view
 
 Displays all textures in the project's Assets folder, along with their properties and asset import
-settings. 
+settings.
 
 The table of issues has the following columns. Use the [table controls](project-auditor-window-reference.md#table-controls) to configure how to organize and display the data.
 

@@ -48,7 +48,7 @@ namespace Unity.ProjectAuditor.Editor.SettingsAnalysis
         public override IEnumerable<ReportItem> Analyze(SettingsAnalysisContext context)
         {
             // Only check for Built-In Rendering Pipeline
-            if (!IsUsingBuiltinRenderPipeline())
+            if (IsUsingBuiltinRenderPipeline())
             {
                 if (IsMixedStandardShaderQuality(context.Params.Platform))
                 {

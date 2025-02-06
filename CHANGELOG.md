@@ -4,6 +4,32 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] - 2025-02-06
+
+### Changed
+* Don't suggest switching Physics 2D update mode to Script for now.
+
+### Fixed
+* Fixed an issue where Project Auditor exhibited compilation issues on certain versions of the Editor.
+* Fixed link to help pages.
+* Fix for PROFB-273; Change summary screen message when an area is not analyzed.
+* Fix for PROFB-274; Added dividers between the foldouts on the shader variant page.
+* Fix for PROFB-277; change text for "1 ignored are hidden".
+* Fix for PROFB-278; 1 items changed to 1 item(s) in the table.
+* Fix for PROFB-279; Build steps all show as info until you hit refresh.
+* Fix for PROFB-280; Removed Path option from the Build Size context menu.
+* Fix for PROFB-281; Unable to sort columns on Build - Build Size screens.
+* Fix for PROFB-284; change references to Texture Streaming when it's now called Mipmap Streaming.
+* Fix for PROFB-285; fix for not being able to hide info compiler messages in the compiler messages view.
+* Fix for PROFB-286; fix performance issues when selecting lots of table items.
+* Fix for PROFB-287; improve documentation for installation instructions.
+* Fix for PROFB-289; exclude shaders that are Hidden from asset issues.
+* Fix for PROFB-290; fix settings links for Physics/Physics 2D.
+* Fix for PROFB-291; issue where rendering path recommendations would show for the wrong pipeline.
+* Fix for PROFB-300; file extensions would sometimes throw because a file didn't have one.
+* Fix for PROFB-310; fix for Analyzing assets causing shader issues to vanish.
+* Fix for PROFB-314; speculative attempt to fix out of memory crash reported on Discussions.
+
 ## [1.0.0] - 2025-02-05
 
 ### Changed
@@ -25,12 +51,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [1.0.0-pre.6] - 2024-11-29
 
-### Added
-
 ### Changed
 * Changed the colours on the summary so the icons and charts match those from style guides
-
-### Removed
 
 ### Fixed
 * Fix for COPT-3240; welcome screen text layout breaks.
@@ -85,7 +107,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 * Fix for COPT-3378; update summary name title based on report's filename.
 * Fix for COPT-3380; change the wording on the "not been analyzed" message.
 * Fix for COPT-3389; project setup -> settings in the text
-* Fix for COPT-3391; match platform strings with Build Profiles menu.  
+* Fix for COPT-3391; match platform strings with Build Profiles menu.
 * Fix for COPT-3394; swap the save and load buttons to match other profiling tools.
 * Fix for COPT-3399; sanitise project name when using it as the default save name for a report.
 * Fix for COPT-3405; group heading can clip with next column in table.

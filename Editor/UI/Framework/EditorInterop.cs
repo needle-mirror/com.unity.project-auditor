@@ -8,6 +8,8 @@ namespace Unity.ProjectAuditor.Editor.UI.Framework
 {
     internal static class EditorInterop
     {
+        const string Physics2DGeneralSettingsTabKey = "UnityEditor.U2D.Physics/GeneralSettingsSelected";
+
         public static void CopyToClipboard(string text)
         {
             EditorGUIUtility.systemCopyBuffer = text;
@@ -59,9 +61,29 @@ namespace Unity.ProjectAuditor.Editor.UI.Framework
                 BuildPlayerWindow.ShowBuildPlayerWindow();
             else
             {
+                string path;
                 // Some Quality setting issue paths will end with the quality level name to identify a specific level
                 // However, the SettingsService API does not support this, so we need to strip the level name
-                var path = location.Path.StartsWith("Project/Quality") ? "Project/Quality" : location.Path;
+                if (location.Path.StartsWith("Project/Quality"))
+                {
+                    path = "Project/Quality";
+                }
+                // Use Physics 2D's settings key to go to the correct tab.
+                else if (location.Path.StartsWith("Project/Physics 2D"))
+                {
+                    EditorPrefs.SetBool(Physics2DGeneralSettingsTabKey, location.Path.EndsWith("General"));
+                    path = "Project/Physics 2D";
+                }
+                #if !UNITY_6000_0_OR_NEWER
+                // Older versions didn't have a separate settings page for physics.
+                else if (location.Path == "Project/Physics/Settings")
+                {
+                    path = "Project/Physics";
+                }
+                #endif
+                else
+                    path = location.Path;
+
                 var window = SettingsService.OpenProjectSettings(path);
                 window.Repaint();
             }

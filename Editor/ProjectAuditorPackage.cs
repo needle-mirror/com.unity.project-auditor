@@ -22,6 +22,8 @@ namespace Unity.ProjectAuditor.Editor
 
             IsLocal = packageInfo.source == PackageSource.Local;
             Version = packageInfo.version;
+            var splitVersion = packageInfo.version.Split('.');
+            VersionShort = splitVersion[0] + '.' + splitVersion[1];
         }
 
         public static bool IsLocal { get; }
@@ -31,5 +33,7 @@ namespace Unity.ProjectAuditor.Editor
         public static string Path { get; }
 
         public static string Version { get; }
+
+        public static string VersionShort { get; }
     }
 }

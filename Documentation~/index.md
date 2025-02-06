@@ -15,7 +15,9 @@ Project Auditor is a suite of static analysis tools for Unity projects. It repor
 
 ## Installation
 
-To install the Project Auditor package, follow the instructions in the [Add and remove UPM packages or feature sets](xref:um-upm-ui-actions) documentation.
+You can use the following link to open the Unity Editor and install Project Auditor via the package manager directly: [Open the Unity Editor and install Project Auditor](com.unity3d.kharma:upmpackage/com.unity.project-auditor)
+
+Alternatively, follow the instructions in the [Add and remove UPM packages or feature sets](xref:um-upm-ui-actions) documentation. You can install the package using the [package registry list](xref:um-upm-ui-install), or by using `com.unity.project-auditor` as the name when [adding a registry package by name](xref:um-upm-ui-quick).
 
 ## Additional resources
 

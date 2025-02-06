@@ -44,7 +44,7 @@ Configure how Project Auditor handles the reports it generates.
 
 To open the Project Settings window, go to **Edit &gt; Project Settings &gt; Project Auditor**.
 
-You can set the threshold at which Project Auditor creates a warning for each of the items in this window, and for each platform available in your project. 
+You can set the threshold at which Project Auditor creates a warning for each of the items in this window, and for each platform available in your project.
 
 |**Setting**|**Description**|
 |---|---|

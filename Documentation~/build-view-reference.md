@@ -49,7 +49,7 @@ Displays all the build steps from the last clean [`BuildReport`](xref:UnityEdito
 
 The Information panel contains details of the Build Report which the asset file data was extracted from.
 
-### Table 
+### Table
 
 The table differs slightly from the ones in other Views. It represents an ordered hierarchical list of build steps, indented to show sub steps. Because of this table formatting, you can't sort the table by column, and several buttons in the table view controls aren't displayed in this View.
 

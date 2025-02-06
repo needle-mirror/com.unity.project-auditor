@@ -38,6 +38,9 @@ namespace Unity.ProjectAuditor.Editor.UI
         {
             base.AddIssues(allIssues);
 
+            var header = m_Table.multiColumnHeader;
+            header.canSort = true;
+
             var list = m_Issues.GroupBy(i => i.GetCustomProperty(BuildReportFileProperty.RuntimeType)).Select(g => new GroupStats
             {
                 assetGroup = g.Key,

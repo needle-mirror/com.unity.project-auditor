@@ -43,10 +43,19 @@ namespace Unity.ProjectAuditor.Editor.SettingsAnalysis
 
         static readonly Descriptor k_TextureStreamingDisabledDescriptor = new Descriptor(
             PAS1007,
+#if UNITY_6000_0_OR_NEWER
+            "Quality: Mipmap streaming is disabled",
+#else
             "Quality: Texture streaming is disabled",
+#endif
             Areas.Memory,
+#if UNITY_6000_0_OR_NEWER
+            "<b>Mipmap Streaming</b> is disabled in Quality Settings. As a result, all mip levels for all loaded textures are loaded into GPU memory, potentially resulting in excessive texture memory usage.",
+            "If your project contains many high resolution mipmapped textures, enable <b>Mipmap Streaming</b> in Quality Settings.")
+#else
             "<b>Texture Streaming</b> is disabled in Quality Settings. As a result, all mip levels for all loaded textures are loaded into GPU memory, potentially resulting in excessive texture memory usage.",
             "If your project contains many high resolution mipmapped textures, enable <b>Texture Streaming</b> in Quality Settings.")
+#endif
         {
             Fixer = (issue, analysisParams) =>
             {
@@ -54,7 +63,11 @@ namespace Unity.ProjectAuditor.Editor.SettingsAnalysis
             },
 
             DocumentationUrl = "https://docs.unity3d.com/Manual/TextureStreaming.html",
+#if UNITY_6000_0_OR_NEWER
+            MessageFormat = "Quality: Mipmap streaming on Quality Level '{0}' is turned off"
+#else
             MessageFormat = "Quality: Texture streaming on Quality Level '{0}' is turned off"
+#endif
         };
 
         static readonly string k_QualityLocation = "Project/Quality";

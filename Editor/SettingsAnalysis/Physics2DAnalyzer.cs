@@ -39,13 +39,14 @@ namespace Unity.ProjectAuditor.Editor.SettingsAnalysis
             if (IsDefaultLayerCollisionMatrix())
             {
                 yield return context.CreateIssue(IssueCategory.ProjectSetting, k_DefaultLayerCollisionMatrixDescriptor.Id)
-                    .WithLocation("Project/Physics 2D");
+                    .WithLocation("Project/Physics 2D/Layer Collision Matrix");
             }
-            if (k_SimulationModeDescriptor.IsApplicable(context.Params) && IsNotUsingSimulationModeScript())
+            // Commented out as per Slack thread https://unity.slack.com/archives/CM6B17X50/p1740487386459879
+            /*if (k_SimulationModeDescriptor.IsApplicable(context.Params) && IsNotUsingSimulationModeScript())
             {
                 yield return context.CreateIssue(IssueCategory.ProjectSetting, k_SimulationModeDescriptor.Id)
-                    .WithLocation("Project/Physics 2D");
-            }
+                    .WithLocation("Project/Physics 2D/General");
+            }*/
         }
 
         internal static bool IsDefaultLayerCollisionMatrix()

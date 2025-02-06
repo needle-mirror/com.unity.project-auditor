@@ -179,6 +179,9 @@ namespace Unity.ProjectAuditor.Editor.UI
                     GUILayout.EndScrollView();
                 }
                 EditorGUILayout.EndVertical();
+
+                ChartUtil.DrawLine(m_2D);
+                GUILayout.Space(10);
             }
 
             EditorGUILayout.EndVertical();

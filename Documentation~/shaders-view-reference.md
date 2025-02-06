@@ -49,7 +49,7 @@ To also view which Shader Variants were requested and compiled at runtime:
 * Run the build on the target platform. Be sure to test every scene and view in the build if you want to generate a complete list of compiled variants.
 * Stop running the build, and locate the [`Player.log`](xref:um-log-files) file. Drag this file onto the Shader Variants View.
 
-Project Auditor then parses the compilation log and populates the **Compiled** column. 
+Project Auditor then parses the compilation log and populates the **Compiled** column.
 
 ### Issue table
 
@@ -68,7 +68,7 @@ The table of issues has the following columns. Use the [table controls](project-
 | **Platform Keywords** | A list of all the [`BuiltInShaderDefine`](xref:UnityEngine.Rendering.BuiltinShaderDefine) keywords set by the Editor for this shader variant. Refer to the selected item detail panel to the right for an alternative view of this keyword list. |
 | **Requirements**      | A list of all the [`ShaderRequirements`](xref:UnityEditor.Rendering.ShaderRequirements) features required by this shader variant. Refer to the selected item detail panel to the right for an alternative view of this requirement list.         |
 
-## Compiler Messages view 
+## Compiler Messages view
 
 Displays shader compiler error and warning messages encountered during the build process.
 

@@ -90,11 +90,11 @@ namespace Unity.ProjectAuditor.Editor
                 }
                 EditorGUI.indentLevel--;
 
-				GUILayout.Space(10);
+                GUILayout.Space(10);
 
                 EditorGUILayout.BeginHorizontal();
                 GUILayout.FlexibleSpace();
-				if (GUILayout.Button("Reset to defaults", GUILayout.Width(200)))
+                if (GUILayout.Button("Reset to defaults", GUILayout.Width(200)))
                 {
                     if (EditorUtility.DisplayDialog("Are you sure?", "Resetting the settings to defaults will lose your current settings, are you sure you wish to continue?", "Yes", "No"))
                     {

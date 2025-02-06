@@ -20,12 +20,12 @@ Every module has a corresponding class inheriting from [`ModuleAnalyzer`](xref:U
 
 ## Create an analyzer
 
-The following is an example showing how to create a custom Analyzer. Imagine a texture-heavy 2D game with a pixel art visual style. In such a project it might be desirable to enforce maximum sizes for sprite texture assets to help manage memory and to enforce a consistent visual resolution. 
+The following is an example showing how to create a custom Analyzer. Imagine a texture-heavy 2D game with a pixel art visual style. In such a project it might be desirable to enforce maximum sizes for sprite texture assets to help manage memory and to enforce a consistent visual resolution.
 
-The example script demonstrates how to do the following: 
+The example script demonstrates how to do the following:
 
 * Declare and register a `Descriptor`, including its custom `Fixer`.
-* Use `DiagnosticParameterAttribute` to declare a diagnostic parameter for use during analysis. 
+* Use `DiagnosticParameterAttribute` to declare a diagnostic parameter for use during analysis.
 * Access the contents of the `context` structure passed to it to decide whether to report an issue.
 * Create an issue, including specifying the [`IssueCategory`](xref:Unity.ProjectAuditor.Editor.IssueCategory) which dictates the view in which the issue appears and the information that is displayed in the Issue table.
 
@@ -42,19 +42,19 @@ class CustomTextureAnalyzer : TextureModuleAnalyzer
 {
     // Define our custom maximum sprite size
     const int k_MaxSpriteSize = 1024;
-    
+
     // Data for constructing a descriptor.
     const string k_SpriteTooBigId = "PAA9000";  // Make sure this ID is unique.
     const string k_Title = "(Custom) Texture: Oversized Sprite";
     const Areas k_ImpactedAreas = Areas.Memory | Areas.Quality;
     const string k_Description =
-        "The source texture for this Sprite is larger than the limit specified by " + 
+        "The source texture for this Sprite is larger than the limit specified by " +
         "the game's art direction. Oversized textures can take up too much memory " +
         "and compromise visual style.";
     const string k_Recommendation =
         "Resize the source texture, or set the <b>Max Size</b> option in the " +
         "Texture Import Settings to a suitable value.";
-    
+
     // Declare a Descriptor to describe the issue we want to report.
     static readonly Descriptor k_CustomSpriteTooBigDescriptor = new Descriptor
     (
@@ -67,17 +67,17 @@ class CustomTextureAnalyzer : TextureModuleAnalyzer
     {
         // As well as the constructor parameters above, this area can be used to set
         // the values of other Descriptor fields.
-        
+
         // Project Auditor will format this message using the Name that's passed into
         // CreateIssue.
-        MessageFormat = "Sprite '{0}' is oversized", 
-        
-        // Optionally declare a delegate to fix the issue in a single button click. 
+        MessageFormat = "Sprite '{0}' is oversized",
+
+        // Optionally declare a delegate to fix the issue in a single button click.
         Fixer = (issue, analysisParams) =>
         {
             var textureImporter =
                 AssetImporter.GetAtPath(issue.RelativePath) as TextureImporter;
-            
+
             if (textureImporter != null)
             {
                 textureImporter.maxTextureSize = k_MaxSpriteSize;
@@ -121,7 +121,7 @@ class CustomTextureAnalyzer : TextureModuleAnalyzer
 <img src="images/custom-analyzer-output.png">
 
 ## Debugging slow analyzers
-The analysis for some issues might take a long time to run, particularly in a large project. The `Descriptor` for such issues might declare `Descriptor.IsEnabledByDefault` to be false to stop them running when running Project Auditor interactively in the Editor. 
+The analysis for some issues might take a long time to run, particularly in a large project. The `Descriptor` for such issues might declare `Descriptor.IsEnabledByDefault` to be false to stop them running when running Project Auditor interactively in the Editor.
 
 When running Project Auditor in a CI/CD environment you can re-enable analysis for these descriptors. Use `AnalysisParams.WithAdditionalDiagnosticRules` to add temporary `Rule` instances to increase the `Severity` of a Descriptor to anything other than `Severity.None` to re-enable analysis in this context.
 

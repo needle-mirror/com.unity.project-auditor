@@ -113,6 +113,9 @@ namespace Unity.ProjectAuditor.Editor.Modules
 
                 context.Importer = textureImporter;
                 context.ImporterPlatformSettings = textureImporter.GetPlatformTextureSettings(platformString);
+
+                bool needToUnloadAssetOnceProcessed = !AssetDatabase.IsMainAssetAtPathLoaded(assetPath);
+
                 context.Texture = AssetDatabase.LoadAssetAtPath<Texture>(assetPath);
 
                 if (string.IsNullOrEmpty(context.Texture.name))
@@ -153,6 +156,12 @@ namespace Unity.ProjectAuditor.Editor.Modules
                 foreach (var analyzer in analyzers)
                 {
                     analysisParams.OnIncomingIssues(analyzer.Analyze(context));
+                }
+
+                if (needToUnloadAssetOnceProcessed)
+                {
+                    Resources.UnloadAsset(context.Texture);
+                    context.Texture = null;
                 }
 
                 progress?.Advance();

@@ -85,7 +85,7 @@ namespace Unity.ProjectAuditor.Editor
         public DiagnosticParams DiagnosticParams;
 
         /// <summary>
-	/// This delegate is called at the start of an analysis to determine whether a given BuildTargetGroup and BuildTarget are supported by this Editor version.
+        /// This delegate is called at the start of an analysis to determine whether a given BuildTargetGroup and BuildTarget are supported by this Editor version.
         /// </summary>
         [JsonIgnore]
         [NonSerialized]

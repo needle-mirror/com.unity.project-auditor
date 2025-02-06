@@ -120,14 +120,14 @@ namespace Unity.ProjectAuditor.Editor
 
         static bool GetAnalyzePackageForIssues()
         {
-                if (!m_AnalyzePackageIsCached)
-                {
-                    m_AnalyzePackageForIssues = EditorPrefs.GetBool(MakeKey(nameof(AnalyzePackagesForIssues)),
-                        k_AnalyzePackageContentsForAssetIssuesDefault);
-                    m_AnalyzePackageIsCached = true;
-                }
+            if (!m_AnalyzePackageIsCached)
+            {
+                m_AnalyzePackageForIssues = EditorPrefs.GetBool(MakeKey(nameof(AnalyzePackagesForIssues)),
+                    k_AnalyzePackageContentsForAssetIssuesDefault);
+                m_AnalyzePackageIsCached = true;
+            }
 
-                return m_AnalyzePackageForIssues;
+            return m_AnalyzePackageForIssues;
         }
 
         public static bool PrettifyJsonOutput
@@ -261,8 +261,8 @@ namespace Unity.ProjectAuditor.Editor
             using (new EditorGUI.DisabledScope(!AnalyzeAfterBuild))
             {
                 EditorGUI.indentLevel++;
-		if (!AnalyzeAfterBuild)
-			FailBuildOnIssues = false;
+                if (!AnalyzeAfterBuild)
+                    FailBuildOnIssues = false;
                 FailBuildOnIssues = EditorGUILayout.Toggle(FailBuildLabelContent, FailBuildOnIssues);
                 EditorGUI.indentLevel--;
             }

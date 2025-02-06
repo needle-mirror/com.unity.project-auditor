@@ -112,6 +112,20 @@ namespace Unity.ProjectAuditor.Editor.Modules
         , IPreprocessComputeShaders
 #endif
     {
+        internal static readonly IssueLayout k_ShaderIssueLayout = new IssueLayout
+        {
+            Category = IssueCategory.AssetIssue,
+            Properties = new[]
+            {
+                new PropertyDefinition { Type = PropertyType.Description, Name = "Issue", LongName = "Issue description", MaxAutoWidth = 800 },
+                new PropertyDefinition { Type = PropertyType.Severity, Format = PropertyFormat.String, Name = "Severity"},
+                new PropertyDefinition { Type = PropertyType.Areas, Format = PropertyFormat.String, Name = "Areas", LongName = "Impacted Areas" },
+                new PropertyDefinition { Type = PropertyType.Path, Name = "Path", MaxAutoWidth = 500 },
+                new PropertyDefinition { Type = PropertyType.Descriptor, Name = "Descriptor", IsDefaultGroup = true},
+                new PropertyDefinition { Type = PropertyType.IsIgnored, Name = "Ignored"},
+            }
+        };
+
         static readonly IssueLayout k_ShaderLayout = new IssueLayout
         {
             Category = IssueCategory.Shader,
@@ -253,6 +267,7 @@ namespace Unity.ProjectAuditor.Editor.Modules
 
         public override IReadOnlyCollection<IssueLayout> SupportedLayouts => new IssueLayout[]
         {
+            k_ShaderIssueLayout,
             k_ShaderLayout,
             k_ShaderVariantLayout,
             k_ComputeShaderVariantLayout,

@@ -1595,8 +1595,9 @@ namespace Unity.ProjectAuditor.Editor.UI
         {
             using (new EditorGUILayout.HorizontalScope(GUILayout.Height(20)))
             {
-                var selectedIssues = activeView.GetSelection();
-                var info = selectedIssues.Length + " / " + activeView.NumFilteredIssues + " Items selected";
+                var selectedIssues = activeView.GetSelectionCount();
+                int selectionSize = Math.Min(selectedIssues, activeView.NumFilteredIssues);
+                var info = selectionSize + " / " + activeView.NumFilteredIssues + " Item(s) selected";
                 EditorGUILayout.LabelField(info, GUILayout.ExpandWidth(true), GUILayout.Width(200));
 
                 GUILayout.FlexibleSpace();
@@ -1813,7 +1814,7 @@ namespace Unity.ProjectAuditor.Editor.UI
 
                 if (m_Report.IsForCurrentProject())
                     m_AssemblyNames = allAssemblies.Where(a => !AssemblyInfoProvider.IsPackageAssembly(a)).ToArray();
-		else
+                else
                     m_AssemblyNames = allAssemblies;
             }
         }

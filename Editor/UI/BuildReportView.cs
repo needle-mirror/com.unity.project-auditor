@@ -31,9 +31,6 @@ If your project uses a custom build script, ensure that it passes the <b>BuildOp
 
         public override void AddIssues(IEnumerable<ReportItem> allIssues)
         {
-            var header = m_Table.multiColumnHeader;
-            header.canSort = false;
-
             base.AddIssues(allIssues);
             m_MetaData.AddRange(allIssues.Where(i => i.Category == IssueCategory.BuildSummary));
         }

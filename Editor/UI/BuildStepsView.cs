@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Unity.ProjectAuditor.Editor.UI.Framework;
 using Unity.ProjectAuditor.Editor.Modules;
 
@@ -11,6 +12,14 @@ namespace Unity.ProjectAuditor.Editor.UI
         public BuildStepsView(ViewManager viewManager) :
             base(viewManager)
         {
+        }
+
+        public override void AddIssues(IEnumerable<ReportItem> allIssues)
+        {
+            base.AddIssues(allIssues);
+
+            var header = m_Table.multiColumnHeader;
+            header.canSort = false;
         }
 
         public override string GetIssueDescription(ReportItem issue)

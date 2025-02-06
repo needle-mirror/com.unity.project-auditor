@@ -14,7 +14,7 @@ public static class ProjectAuditorCI
         var projectAuditor = new ProjectAuditor();
         var report = projectAuditor.Audit();
         report.Save(reportPath);
-        
+
         var codeIssues = report.FindByCategory(IssueCategory.Code);
         Debug.Log($"Project Auditor found {codeIssues.Count} code issues");
     }
@@ -35,7 +35,7 @@ The [`ProjectAuditor`](xref:Unity.ProjectAuditor.Editor.ProjectAuditor) class pr
 
 To configure analysis differently, or to specify callbacks for some stages in the analysis process, create an`AnalysisParams` object and configure it as required, then pass it as a parameter into a `ProjectAuditor` Audit method.
 
-For example, the following code performs asynchronous analysis of a project's code (ignoring other areas such as Assets and Project Settings) on the default player assembly, compiled in debug mode for Android devices. Callbacks are declared to count and log the number of issues. 
+For example, the following code performs asynchronous analysis of a project's code (ignoring other areas such as Assets and Project Settings) on the default player assembly, compiled in debug mode for Android devices. Callbacks are declared to count and log the number of issues.
 
 ```c#
 int foundIssues = 0;
@@ -50,7 +50,7 @@ var analysisParams = new AnalysisParams
   {
     Debug.Log($"Found {foundIssues} code issues");
     report.Save(reportPath);
-  }  
+  }
 };
 
 projectAuditor.AuditAsync(analysisParams);

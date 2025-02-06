@@ -171,12 +171,16 @@ namespace Unity.ProjectAuditor.Editor.Utils
                 case BuildTarget.GameCoreXboxOne:           return "Xbox One";
                 case BuildTarget.GameCoreXboxSeries:        return "Xbox Series X|S";
                 case BuildTarget.PS5:                       return "PlayStation®5";
-#if UNITY_2021_3_OR_NEWER
+#if (PA_UNITY_2021_3_7_OR_NEWER && !((UNITY_2022_1_OR_NEWER || UNITY_2022_2_OR_NEWER) && !UNITY_2022_3_OR_NEWER))
                 case BuildTarget.LinuxHeadlessSimulation:   return "Linux Headless Simulation";
+#endif
+#if UNITY_2021_2_OR_NEWER
                 case BuildTarget.EmbeddedLinux:             return "Embedded Linux";
 #endif
-#if UNITY_2022_3_OR_NEWER
+#if UNITY_2022_1_OR_NEWER
                 case BuildTarget.QNX:                       return "QNX®";
+#endif
+#if (PA_UNITY_2022_3_5_OR_NEWER && !((UNITY_2023_1_OR_NEWER || UNITY_2023_2_OR_NEWER) && !UNITY_6000_0_OR_NEWER))
                 case BuildTarget.VisionOS:                  return "visionOS";
 #endif
                 default: return BuildPipeline.GetBuildTargetName(buildTarget);
@@ -196,13 +200,19 @@ namespace Unity.ProjectAuditor.Editor.Utils
                 case BuildTargetGroup.XboxOne:                 return GetModernBuildTargetName(BuildTarget.XboxOne);
                 case BuildTargetGroup.tvOS:                    return GetModernBuildTargetName(BuildTarget.tvOS);
                 case BuildTargetGroup.Switch:                  return GetModernBuildTargetName(BuildTarget.Switch);
+#if (PA_UNITY_2021_3_7_OR_NEWER && !((UNITY_2022_1_OR_NEWER || UNITY_2022_2_OR_NEWER) && !UNITY_2022_3_OR_NEWER))
                 case BuildTargetGroup.LinuxHeadlessSimulation: return GetModernBuildTargetName(BuildTarget.LinuxHeadlessSimulation);
+#endif
                 case BuildTargetGroup.GameCoreXboxOne:         return GetModernBuildTargetName(BuildTarget.GameCoreXboxOne);
                 case BuildTargetGroup.GameCoreXboxSeries:      return GetModernBuildTargetName(BuildTarget.GameCoreXboxSeries);
                 case BuildTargetGroup.PS5:                     return GetModernBuildTargetName(BuildTarget.PS5);
+#if UNITY_2021_2_OR_NEWER
                 case BuildTargetGroup.EmbeddedLinux:           return GetModernBuildTargetName(BuildTarget.EmbeddedLinux);
-#if UNITY_2022_3_OR_NEWER
+#endif
+#if UNITY_2022_1_OR_NEWER
                 case BuildTargetGroup.QNX:                     return GetModernBuildTargetName(BuildTarget.QNX);
+#endif
+#if (PA_UNITY_2022_3_5_OR_NEWER && !((UNITY_2023_1_OR_NEWER || UNITY_2023_2_OR_NEWER) && !UNITY_6000_0_OR_NEWER))
                 case BuildTargetGroup.VisionOS:                return GetModernBuildTargetName(BuildTarget.VisionOS);
 #endif
                 default: return "Unknown platform group";

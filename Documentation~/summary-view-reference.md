@@ -1,6 +1,6 @@
 # Summary view reference
 
-After completing a [project analysis](analyze-project.md) or loading a Report, Project Auditor displays the Summary View. 
+After completing a [project analysis](analyze-project.md) or loading a Report, Project Auditor displays the Summary View.
 
 This view displays a high level overview of the issues that Project Auditor found.
 
