@@ -1,5 +1,9 @@
 using UnityEditor.IMGUI.Controls;
 
+#if UNITY_6000_2_OR_NEWER
+using TreeViewState = UnityEditor.IMGUI.Controls.TreeViewState<int>;
+#endif
+
 namespace Unity.ProjectAuditor.Editor.UI.Framework
 {
     class AreaSelectionWindow : SelectionWindow

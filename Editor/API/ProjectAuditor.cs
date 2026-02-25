@@ -22,7 +22,8 @@ namespace Unity.ProjectAuditor.Editor
         /// </summary>
         public int callbackOrder => 1;  // We want LastBuildReportProvider to update its cached report before we run analysis.
 
-        internal static string s_DataPath => ProjectAuditorPackage.Path + "/Data";
+        internal static string s_RulesDataPath => ProjectAuditorRulesPackage.Path + "/Rules";
+        internal static string s_RoslynAnalyzersDataPath => ProjectAuditorRulesPackage.Path + "/RoslynAnalyzers";
 
         internal const string DisplayName = "Project Auditor";
 
@@ -128,6 +129,7 @@ namespace Unity.ProjectAuditor.Editor
             {
                 // early out if, for any reason, there are no registered Modules
                 analysisParams.OnCompleted(report);
+                Debug.LogWarning($"[{ProjectAuditor.DisplayName}] Could not find any registered modules.");
                 return;
             }
 
@@ -267,6 +269,9 @@ namespace Unity.ProjectAuditor.Editor
 
         void InitModules()
         {
+            if (ProjectAuditorRulesPackage.IsInstalled == false)
+                return;
+
             foreach (var type in TypeCache.GetTypesDerivedFrom(typeof(Module)))
             {
                 if (type.IsAbstract)

@@ -91,6 +91,11 @@ namespace Unity.ProjectAuditor.Editor
         public string Method;
 
         /// <summary>
+        /// Return type of a known code API issue. See https://jira.unity3d.com/browse/PROFB-318 for more details on why this is useful.
+        /// </summary>
+        public string ReturnType;
+
+        /// <summary>
         /// The evaluated value of a know code API issue.
         /// </summary>
         public string Value;

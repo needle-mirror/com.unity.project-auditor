@@ -1,3 +1,6 @@
+>[!NOTE]
+> This documentation is for the Project Auditor package, compatible with Unity 6.3 and earlier. Unity versions 6.4 and later include Project Auditor built-in by default. You can open it from **Window** &gt; **Analysis** &gt; **Project Auditor**. For the documentation on the built-in Project Auditor included in Unity 6.4 and later, refer to the Unity User Manual documentation [Analyze your project with Project Auditor](https://docs.unity3d.com/6000.4/Documentation/Manual/project-auditor/analyze-project.html).
+
 # Run Project Auditor from the command line
 
 You can execute Project Auditor's analysis from command line by launching the Unity Editor [in batch mode](xref:um-cli-batchmode-coroutines). This requires an Editor script that creates a `ProjectAuditor` instance and runs the analysis. The following is an example of such a script:

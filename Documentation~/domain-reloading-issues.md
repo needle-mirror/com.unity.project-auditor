@@ -1,3 +1,6 @@
+>[!NOTE]
+> This documentation is for the Project Auditor package, compatible with Unity 6.3 and earlier. Unity versions 6.4 and later include Project Auditor built-in by default. You can open it from **Window** &gt; **Analysis** &gt; **Project Auditor**. For the documentation on the built-in Project Auditor included in Unity 6.4 and later, refer to the Unity User Manual documentation [Analyze your project with Project Auditor](https://docs.unity3d.com/6000.4/Documentation/Manual/project-auditor/analyze-project.html).
+
 # Domain reloading issues
 
 The [Domain Reload view](code-view-reference.md#domain-reload-view) displays the results of a Roslyn analyzer that detects code issues that result in unexpected or non-deterministic behavior if domain reload is disabled in your project. Domain reloading can impact project iteration times (in particular, the time it takes to enter and exit Play mode), so it's best practice to fix all the issues, and then disable domain reload.

@@ -1,12 +1,14 @@
+>[!NOTE]
+> This documentation is for the Project Auditor package, compatible with Unity 6.3 and earlier. Unity versions 6.4 and later include Project Auditor built-in by default. You can open it from **Window** &gt; **Analysis** &gt; **Project Auditor**. For the documentation on the built-in Project Auditor included in Unity 6.4 and later, refer to the Unity User Manual documentation [Analyze your project with Project Auditor](https://docs.unity3d.com/6000.4/Documentation/Manual/project-auditor/analyze-project.html).
+
 # Shaders view reference
 
 The Shaders view displays information related to the shaders in your project and how they impact the performance of your project. You can select from the following views:
 
-* [Shaders](#shaders-view)
-* [Shader Variants](#shader-variants-view)
-* [Compiler Messages](#compiler-messages-view)
-* [Materials](#materials-view)
-
+* [Shaders view](#shaders-view)
+* [Shader Variants View](#shader-variants-view)
+* [Compiler Messages view](#compiler-messages-view)
+* [Materials view](#materials-view)
 
 ## Shaders view
 
@@ -19,7 +21,7 @@ The table of issues has the following columns. Use the [table controls](project-
 | :---- | :---- |
 | **Shader Name** | The shader name, as declared inside the .shader file itself. For the actual asset file name, refer to the **Path** column. |
 | **Size** | The file size of the shader, as reported in the most recent build report. Shaders that weren't included in the build are reported as being 0 bytes in size. |
-| **Num Variants** | Number of potential shader variants for a single stage (for example: fragment), per rendering platform API (for example: Vulkan). This is the raw number of variants from considering keyword combinations, and contributes to build times and sizes. The build process might strip these variants down to a smaller number of variants that are actually included in the build. |
+| **Max Variants** | Number of potential shader variants for a single stage (for example: fragment), per rendering platform API (for example: Vulkan). This is the raw number of variants from considering keyword combinations, and contributes to build times and sizes. The build process might strip these variants down to a smaller number of variants that are actually included in the build. |
 | **Built Fragment Variants** | Number of fragment shader variants per rendering platform API (for example: Vulkan) that were actually included in the build. |
 | **Num Passes** | The number of passes included in this shader. |
 | **Num Keywords** | The number of keywords referenced in this shader, including both globally keywords and local keywords declared in `#pragma` statements in this shader. |
@@ -88,13 +90,13 @@ Displays all material assets in the project's Assets folder, along with their pr
 import settings.
 
 >[!TIP]
->Enable the **Show/Hide hierarchy** button select **Group By: Shader** to easily see all of the materials that reference a particular shader.
+>Enable **Show/Hide hierarchy** and select **Group By: Shader** to view all the materials that reference a particular shader.
 
 The table of issues has the following columns. Use the [table controls](project-auditor-window-reference.md#table-controls) to configure how to organize and display the data.
 
 |**Property**|**Description**|
 | :---- | :---- |
-| **Material Name** | The material file name.                                              |
+| **Name** | The material file name.                                              |
 | **Shader**        | The name of the shader referenced by this material.                  |
 | **Source Asset**  | The full path to the source material asset within the Assets folder. |
 

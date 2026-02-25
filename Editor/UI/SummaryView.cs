@@ -749,7 +749,8 @@ namespace Unity.ProjectAuditor.Editor.UI
                 new KeyValuePair<string, string>("Project Revision", sessionInfo.ProjectRevision),
                 new KeyValuePair<string, string>("Unity Version", sessionInfo.UnityVersion),
                 new KeyValuePair<string, string>("Project ID", sessionInfo.ProjectId),
-                new KeyValuePair<string, string>($"{ProjectAuditor.DisplayName} Version", sessionInfo.ProjectAuditorVersion)
+                new KeyValuePair<string, string>($"{ProjectAuditor.DisplayName} Version", sessionInfo.ProjectAuditorVersion),
+                new KeyValuePair<string, string>("Rules Version", sessionInfo.ProjectAuditorRulesVersion)
             };
 
             using (new EditorGUILayout.HorizontalScope())

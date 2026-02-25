@@ -1,3 +1,6 @@
+>[!NOTE]
+> This documentation is for the Project Auditor package, compatible with Unity 6.3 and earlier. Unity versions 6.4 and later include Project Auditor built-in by default. You can open it from **Window** &gt; **Analysis** &gt; **Project Auditor**. For the documentation on the built-in Project Auditor included in Unity 6.4 and later, refer to the Unity User Manual documentation [Analyze your project with Project Auditor](https://docs.unity3d.com/6000.4/Documentation/Manual/project-auditor/analyze-project.html).
+
 # Compare issues and insights
 
 You can save the [`Report`](xref:Unity.ProjectAuditor.Editor.Report) object produced by Project Auditor's analysis as a .projectauditor file, or examine it via its API. `Report` contains a `SessionInfo` object with information about the analysis session, including a copy of the `AnalysisParams` which Project Auditor used to configure the analysis. It also provides several methods to access the report's list of discovered `ReportItem` instances. Each `ReportItem` represents a single issue or insight: all the data for a single item in one of the tables that are available in the [Project Auditor window](project-auditor-window-reference.md).

@@ -20,6 +20,7 @@ namespace Unity.ProjectAuditor.Editor.Core
                 {
                     Type = rawDescriptor.Type ?? string.Empty,
                     Method = rawDescriptor.Method ?? string.Empty,
+                    ReturnType = rawDescriptor.ReturnType ?? string.Empty,
                     Value = rawDescriptor.Value,
                     Platforms = rawDescriptor.Platforms,
                     DefaultSeverity = rawDescriptor.DefaultSeverity == Severity.Default ? Severity.Moderate : rawDescriptor.DefaultSeverity,

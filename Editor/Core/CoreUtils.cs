@@ -8,11 +8,15 @@ namespace Unity.ProjectAuditor.Editor.Core
 {
     internal static class CoreUtils
     {
+        // We look at the Type (passed in as type) to see what attributes it has
+        // If it does not have any AnalysisPlatformAttributes then it is considered to support all platforms
+        // Otherwise we check to see if the attributes match the currently selected platform (passed in as platform)
         public static bool SupportsPlatform(Type type, BuildTarget platform)
         {
             if (!type.CustomAttributes.Any())
                 return true;
-            return type.GetCustomAttributes<AnalysisPlatformAttribute>().Any(a => a.Platform == platform);
+            var analysisPlatformAttributes = type.GetCustomAttributes<AnalysisPlatformAttribute>();
+            return !analysisPlatformAttributes.Any() || analysisPlatformAttributes.Any(a => a.Platform == platform);
         }
 
         public static Severity LogTypeToSeverity(LogType logType)

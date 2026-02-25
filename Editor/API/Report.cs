@@ -35,6 +35,11 @@ namespace Unity.ProjectAuditor.Editor
         public string ProjectAuditorVersion;
 
         /// <summary>
+        /// The version number of the Project Auditor rules package which was used.
+        /// </summary>
+        public string ProjectAuditorRulesVersion;
+
+        /// <summary>
         /// The version of Unity which was used.
         /// </summary>
         public string UnityVersion;
@@ -197,6 +202,7 @@ namespace Unity.ProjectAuditor.Editor
             SessionInfo = new SessionInfo(analysisParams)
             {
                 ProjectAuditorVersion = ProjectAuditorPackage.Version,
+                ProjectAuditorRulesVersion = ProjectAuditorRulesPackage.Version,
 
                 ProjectId = PlayerSettings.productGUID.ToString(),
                 ProjectName = Application.productName,

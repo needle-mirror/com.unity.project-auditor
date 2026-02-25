@@ -412,6 +412,11 @@ namespace Unity.ProjectAuditor.Editor.UI.Framework
             }
         }
 
+        public static int GetStatusWheelFrame()
+        {
+            return (int)Mathf.Repeat(Time.realtimeSinceStartup * 10, 11.99f);
+        }
+
         static GUIContent GetStatusWheel()
         {
             if (s_StatusWheel == null)
@@ -421,7 +426,7 @@ namespace Unity.ProjectAuditor.Editor.UI.Framework
                     s_StatusWheel[i] = EditorGUIUtility.IconContent("WaitSpin" + i.ToString("00"));
             }
 
-            int frame = (int)Mathf.Repeat(Time.realtimeSinceStartup * 10, 11.99f);
+            int frame = GetStatusWheelFrame();
             return s_StatusWheel[frame];
         }
 

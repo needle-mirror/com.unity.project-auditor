@@ -37,7 +37,7 @@ namespace Unity.ProjectAuditor.Editor.SettingsAnalysis
             m_ProjectSettingsMapping.Add(new KeyValuePair<string, string>("UnityEngine.AudioModule",
                 "Project/Audio"));
 
-            m_Descriptors = DescriptorLoader.LoadFromJson(ProjectAuditor.s_DataPath, "ProjectSettings");
+            m_Descriptors = DescriptorLoader.LoadFromJson(ProjectAuditor.s_RulesDataPath, "ProjectSettings");
             foreach (var descriptor in m_Descriptors)
             {
                 registerDescriptor(descriptor);

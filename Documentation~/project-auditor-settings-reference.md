@@ -1,3 +1,6 @@
+>[!NOTE]
+> This documentation is for the Project Auditor package, compatible with Unity 6.3 and earlier. Unity versions 6.4 and later include Project Auditor built-in by default. You can open it from **Window** &gt; **Analysis** &gt; **Project Auditor**. For the documentation on the built-in Project Auditor included in Unity 6.4 and later, refer to the Unity User Manual documentation [Analyze your project with Project Auditor](https://docs.unity3d.com/6000.4/Documentation/Manual/project-auditor/analyze-project.html).
+
 # Project Auditor settings reference
 
 You can configure Project Auditor in the following places in the Unity Editor:
@@ -48,13 +51,13 @@ You can set the threshold at which Project Auditor creates a warning for each of
 
 |**Setting**|**Description**|
 |---|---|
+|**StreamingAssets folder size limit**|Creates an issue if the [StreamingAssets](xref:um-streaming-assets) folder is larger than this value in MB. Applies to mobile devices only.|
 |**Empty Sprite Atlas use threshold**|Warns if the percentage of unused pixels in a Sprite Atlas is greater than this value. Set to 100 to disable Sprite Atlas analysis.|
 |**Maximum non-streaming Texture size**|Creates an issue if a Texture is larger than this value in pixels.|
 |**Streaming Audio Clip Threshold**|Creates an issue if a streaming Audio Clip is larger than this value in bytes.|
 |**Decompressed Audio Clip Threshold**|Creates an issue if a decompressed Audio Clip is larger than this value in bytes.|
 |**Compressed Audio Clip Threshold**|Creates an issue if a compressed Audio Clip is larger than this value in bytes.|
 |**Load in Background Audio Clip Threshold**|Creates an issue if a load in background Audio Clip is larger than this value in bytes.|
-|**StreamingAssets folder size limit**|Creates an issue if the StreamingAssets folder is larger than this value in MB.|
 
 ## Additional resources
 

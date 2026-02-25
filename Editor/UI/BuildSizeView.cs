@@ -71,7 +71,7 @@ namespace Unity.ProjectAuditor.Editor.UI
                     var width = 200;
                     var dataSize = m_GroupStats.Sum(g => g.size);
                     EditorGUILayout.BeginHorizontal();
-                    EditorGUILayout.LabelField("Size of Data (Uncompressed)", SharedStyles.Label, GUILayout.Width(width));
+                    EditorGUILayout.LabelField("Total Assets size (Uncompressed)", SharedStyles.Label, GUILayout.Width(width));
                     EditorGUILayout.LabelField(Formatting.FormatSize((ulong)dataSize), SharedStyles.Label);
                     EditorGUILayout.EndHorizontal();
                     EditorGUILayout.LabelField($"Size By Runtime Type (Top {k_MaxGroupCount})", SharedStyles.BoldLabel);

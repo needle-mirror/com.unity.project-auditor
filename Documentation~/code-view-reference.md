@@ -1,3 +1,6 @@
+>[!NOTE]
+> This documentation is for the Project Auditor package, compatible with Unity 6.3 and earlier. Unity versions 6.4 and later include Project Auditor built-in by default. You can open it from **Window** &gt; **Analysis** &gt; **Project Auditor**. For the documentation on the built-in Project Auditor included in Unity 6.4 and later, refer to the Unity User Manual documentation [Analyze your project with Project Auditor](https://docs.unity3d.com/6000.4/Documentation/Manual/project-auditor/analyze-project.html).
+
 # Code view reference
 
 The Code view displays issues related to the C# code in your project. This view is divided into the following screens:
@@ -39,7 +42,7 @@ The table of issues has the following columns. Use the [table controls](project-
 |---|---|
 |**Issue**|Summary of the issue. Right-click on the issue to open its relevant code file, or open the documentation where possible.|
 |**Severity**|An estimate of the severity of the issue. Severity can be Major, Moderate, Minor, or Ignored. All issues found in code paths that are called every frame are automatically marked as Major.|
-|**Area**|The area of performance that this issue affects. Area can be CPU, Memory, or both.|
+|**Areas**|The area of performance that this issue affects. Area can be CPU, Memory, or both.|
 |**Filename**|The name of the file that this issue occurred in, along with the line number. Double-click the issue to open it in your IDE.|
 |**Assembly**|The name of the assembly the code file is a part of.|
 |**Descriptor**|Categorizes the issue with this code.|
@@ -120,6 +123,9 @@ The table of issues has the following columns. Use the [table controls](project-
 | **Issue**    | The error/warning message string reported by the compiler. Select an item in the table to display the full message in the panel to the right.|
 | **Filename** | The name of the file that this issue occurred in, along with the line number. Double-click the issue to open it in your IDE. |
 | **Assembly** | The assembly which contains the file that generated the message. The default assembly for user code in a Unity project is called Assembly-CSharp. |
+| **Descriptor** | Categorizes the issue with this code.|
+| **Ignored** | Displays True if the issue is ignored. To ignore an issue, choose it in the list and then select **Ignore Issue** in the **Details** panel to the right. To display ignored issues, select **Show Ignored Issues** in the **Filters** panel. |
+
 
 ## Additional resources
 

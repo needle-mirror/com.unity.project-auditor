@@ -16,7 +16,12 @@ using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 using UnityEngine.Profiling;
-using UnityEngine.Serialization;
+using UnityEditor.PackageManager.Requests;
+using UnityEditor.PackageManager;
+
+#if UNITY_6000_2_OR_NEWER
+using TreeViewState = UnityEditor.IMGUI.Controls.TreeViewState<int>;
+#endif
 
 namespace Unity.ProjectAuditor.Editor.UI
 {
@@ -97,6 +102,28 @@ namespace Unity.ProjectAuditor.Editor.UI
         [SerializeField] Tab m_SelectedNonAnalyzedTab;
 
         Vector2 m_PreviousWindowSize;
+
+        static AddRequest RulesPackageInstallRequest;
+
+        static void RulesPackageInstallProgressCallback()
+        {
+            var wnd = GetWindow(typeof(ProjectAuditorWindow)) as ProjectAuditorWindow;
+            if (wnd != null)
+                wnd.Repaint();
+
+            if (RulesPackageInstallRequest.IsCompleted)
+            {
+                if (RulesPackageInstallRequest.Status == StatusCode.Success)
+                    Debug.Log("Installed: " + RulesPackageInstallRequest.Result.packageId);
+                else if (RulesPackageInstallRequest.Status >= StatusCode.Failure)
+                    Debug.Log(RulesPackageInstallRequest.Error.message);
+
+                EditorApplication.update -= RulesPackageInstallProgressCallback;
+                RulesPackageInstallRequest = null;
+
+                ProjectAuditorRulesPackage.Initialize();
+            }
+        }
 
         private static Tab[] GetDefaultTabs()
         {
@@ -1497,9 +1524,10 @@ namespace Unity.ProjectAuditor.Editor.UI
                         }
 
                         // Analyze button
-                        using (new EditorGUI.DisabledScope(m_AnalysisState == AnalysisState.InProgress))
+                        using (new EditorGUI.DisabledScope((m_AnalysisState == AnalysisState.InProgress) || (ProjectAuditorRulesPackage.IsInstalled == false) || (RulesPackageInstallRequest != null)))
                         {
-                            if (GUILayout.Button(Contents.AnalyzeButton, GUILayout.Width(k_ButtonWidth), GUILayout.Height(30)))
+                            var content = ProjectAuditorRulesPackage.IsInstalled ? Contents.AnalyzeButton : Contents.AnalyzeButtonDisabled;
+                            if (GUILayout.Button(content, GUILayout.Width(k_ButtonWidth), GUILayout.Height(30)))
                             {
                                 if (projectAreas == ProjectAreaFlags.None)
                                 {
@@ -1521,6 +1549,32 @@ namespace Unity.ProjectAuditor.Editor.UI
                                 }
                             }
                         }
+
+                        // Install rules
+                        using (new EditorGUI.DisabledScope((m_AnalysisState == AnalysisState.InProgress) || (ProjectAuditorRulesPackage.IsLatest) || (RulesPackageInstallRequest != null)))
+                        {
+                            var content = Contents.InstallRulesButton;
+                            if (RulesPackageInstallRequest != null)
+                            {
+                                int frame = Utility.GetStatusWheelFrame();
+                                content = Contents.UpdateRulesButtonInProgress[frame];
+                            }
+                            else if (ProjectAuditorRulesPackage.IsLatest)
+                            {
+                                content = Contents.UpdateRulesButtonDisabled;
+                            }
+                            else if (ProjectAuditorRulesPackage.IsInstalled)
+                            {
+                                content = Contents.UpdateRulesButton;
+                            }
+
+                            if (GUILayout.Button(content, GUILayout.Width(k_ButtonWidth), GUILayout.Height(30)))
+                            {
+                                RulesPackageInstallRequest = Client.Add(ProjectAuditorRulesPackage.Name);
+                                EditorApplication.update += RulesPackageInstallProgressCallback;
+                            }
+                        }
+
                         GUILayout.FlexibleSpace();
                     }
 
@@ -1621,7 +1675,8 @@ namespace Unity.ProjectAuditor.Editor.UI
                     SharedStyles.SetFontDynamicSize(m_ViewStates.fontSize);
                 }
 
-                EditorGUILayout.LabelField("Ver. " + ProjectAuditorPackage.Version, EditorStyles.label, GUILayout.Width(120));
+                EditorGUILayout.LabelField($"Ver {ProjectAuditorPackage.Version} / Rules {ProjectAuditorRulesPackage.Version}", EditorStyles.label, GUILayout.Width(120));
+
             }
         }
 
@@ -1940,9 +1995,13 @@ namespace Unity.ProjectAuditor.Editor.UI
                     }
                 }
 
-                if (GUILayout.Button(Contents.LoadButton, EditorStyles.toolbarButton, GUILayout.Width(loadSaveButtonWidth)))
+                using (new EditorGUI.DisabledScope(m_AnalysisState == AnalysisState.InProgress || !ProjectAuditorRulesPackage.IsInstalled))
                 {
-                    LoadReport();
+                    var loadContent = ProjectAuditorRulesPackage.IsInstalled ? Contents.LoadButton : Contents.LoadButtonDisabled;
+                    if (GUILayout.Button(loadContent, EditorStyles.toolbarButton, GUILayout.Width(loadSaveButtonWidth)))
+                    {
+                        LoadReport();
+                    }
                 }
 
                 using (new EditorGUI.DisabledScope(m_AnalysisState != AnalysisState.Valid))
@@ -2244,9 +2303,20 @@ namespace Unity.ProjectAuditor.Editor.UI
 
             public static readonly GUIContent AnalyzeButton =
                 new GUIContent("Start Analysis", "Analyze Project and list all issues found.");
+            public static readonly GUIContent AnalyzeButtonDisabled =
+                new GUIContent("Start Analysis", $"Please install the rules package to analyze your project ({ProjectAuditorRulesPackage.Name}).");
+
+            public static readonly GUIContent InstallRulesButton =
+                new GUIContent("Install Rules", $"Please install the rules package to analyze your project ({ProjectAuditorRulesPackage.Name}).");
+            public static readonly GUIContent UpdateRulesButton =
+                new GUIContent("Update Rules", $"Please update your rules package to the latest version ({ProjectAuditorRulesPackage.Name}@{ProjectAuditorRulesPackage.LatestVersion}).");
+            public static readonly GUIContent UpdateRulesButtonDisabled =
+                new GUIContent("Update Rules", "Everything is up to date!");
+            public static readonly GUIContent[] UpdateRulesButtonInProgress;
 
             public static readonly GUIContent SaveButton = Utility.GetIcon(Utility.IconType.Save, "Save current report to projectauditor file");
             public static readonly GUIContent LoadButton = Utility.GetIcon(Utility.IconType.Load, "Load report from projectauditor file");
+            public static readonly GUIContent LoadButtonDisabled = Utility.GetIcon(Utility.IconType.Load, $"Please install the rules package to load reports ({ProjectAuditorRulesPackage.Name}).");
             public static readonly GUIContent DiscardButton = EditorGUIUtility.TrTextContentWithIcon("New Analysis", "Discard the current report and return to the Welcome view.", "Refresh");
 
             public static readonly GUIContent HelpButton = Utility.GetIcon(Utility.IconType.Help, "Open Manual (in a web browser)");
@@ -2297,6 +2367,13 @@ namespace Unity.ProjectAuditor.Editor.UI
             public static readonly GUIContent CompilationModeSelection =
                 new GUIContent("Compilation Mode", "Select the compilation mode.");
 #endif
+
+            static Contents()
+            {
+                UpdateRulesButtonInProgress = new GUIContent[12];
+                for (int i = 0; i < 12; i++)
+                    UpdateRulesButtonInProgress[i] = EditorGUIUtility.TrTextContentWithIcon(" Installing Rules...", "WaitSpin" + i.ToString("00"));
+            }
         }
     }
 }

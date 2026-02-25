@@ -30,12 +30,6 @@ namespace Unity.ProjectAuditor.Editor.Modules
         Num
     }
 
-    enum MaterialProperty
-    {
-        Shader = 0,
-        Num
-    }
-
     enum ShaderVariantProperty
     {
         Compiled = 0,
@@ -144,17 +138,6 @@ namespace Unity.ProjectAuditor.Editor.Modules
                 new PropertyDefinition { Type = PropertyTypeUtil.FromCustom(ShaderProperty.SrpBatcher), Format = PropertyFormat.Bool, Name = "SRP Batcher", LongName = "SRP Batcher Compatible" },
                 new PropertyDefinition { Type = PropertyTypeUtil.FromCustom(ShaderProperty.AlwaysIncluded), Format = PropertyFormat.Bool, Name = "Always Included", LongName = "Always Included in Build" },
                 new PropertyDefinition { Type = PropertyType.Path, Name = "Path", MaxAutoWidth = 500 }
-            }
-        };
-
-        static readonly IssueLayout k_MaterialLayout = new IssueLayout
-        {
-            Category = IssueCategory.Material,
-            Properties = new[]
-            {
-                new PropertyDefinition { Type = PropertyType.Description, Name = "Material Name" },
-                new PropertyDefinition { Type = PropertyTypeUtil.FromCustom(MaterialProperty.Shader), Format = PropertyFormat.String, Name = "Shader", IsDefaultGroup = true },
-                new PropertyDefinition { Type = PropertyType.Path, Name = "Source Asset", MaxAutoWidth = 500 }
             }
         };
 
@@ -271,8 +254,7 @@ namespace Unity.ProjectAuditor.Editor.Modules
             k_ShaderLayout,
             k_ShaderVariantLayout,
             k_ComputeShaderVariantLayout,
-            k_ShaderCompilerMessageLayout,
-            k_MaterialLayout
+            k_ShaderCompilerMessageLayout
         };
 
         public override AnalysisResult Audit(AnalysisParams analysisParams, IProgress progress = null)
@@ -286,8 +268,6 @@ namespace Unity.ProjectAuditor.Editor.Modules
             ProcessShaders(analysisParams, shaderPathMap);
 
             ProcessComputeShaders(analysisParams);
-
-            ProcessMaterials(context);
 
             // clear collected variants before next build
             ClearBuildData();
@@ -332,25 +312,6 @@ namespace Unity.ProjectAuditor.Editor.Modules
             }
 
             return shaderPathMap;
-        }
-
-        Dictionary<Material, string> CollectMaterials(AnalysisContext context)
-        {
-            var materialPathMap = new Dictionary<Material, string>();
-            var assetPaths = GetAssetPathsByFilter("t:material", context);
-            foreach (var assetPath in assetPaths)
-            {
-                var material = AssetDatabase.LoadAssetAtPath<Material>(assetPath);
-                if (material == null)
-                {
-                    Debug.LogError(assetPath + " is not a Material.");
-                    continue;
-                }
-
-                materialPathMap.Add(material, assetPath);
-            }
-
-            return materialPathMap;
         }
 
         static Dictionary<Shader, string> GetBuiltShaderPaths()
@@ -471,26 +432,6 @@ namespace Unity.ProjectAuditor.Editor.Modules
             }
             if (issues.Any())
                 analysisParams.OnIncomingIssues(issues);
-        }
-
-        void ProcessMaterials(AnalysisContext context)
-        {
-            var issues = new List<ReportItem>();
-
-            var materialPathMap = CollectMaterials(context);
-            foreach (var material in materialPathMap)
-            {
-                issues.Add(context.CreateInsight(k_MaterialLayout.Category, material.Key.name)
-                    .WithCustomProperties(new object[(int)MaterialProperty.Num]
-                    {
-                        material.Key.shader.name
-                    })
-                    .WithLocation(material.Value)
-                );
-            }
-
-            if (issues.Any())
-                context.Params.OnIncomingIssues(issues);
         }
 
         IEnumerable<ReportItem> ProcessShader(ShaderAnalysisContext context, string assetSize, bool isAlwaysIncluded)
@@ -754,8 +695,9 @@ namespace Unity.ProjectAuditor.Editor.Modules
 
             foreach (var line in lines)
             {
-                var parts = line.Split(new[] {", pass: ", ", stage: ", ", keywords "}, StringSplitOptions.None);
-                if (parts.Length != 4)
+                var parts = line.Split(new[] {" (instance ", ", pass: ", ", stage: ", ", keywords ", ", time"}, StringSplitOptions.None);
+
+                if (parts.Length != 4 && parts.Length != 6)
                 {
                     Debug.LogError("Malformed shader compilation log info: " + line);
                     continue;
@@ -765,6 +707,14 @@ namespace Unity.ProjectAuditor.Editor.Modules
                 var pass = parts[1];
                 var stage = parts[2];
                 var keywordsString = parts[3];
+
+                if (parts.Length == 6)
+                {
+                    pass = parts[2];
+                    stage = parts[3];
+                    keywordsString = parts[4];
+                }
+
                 var keywords = SplitKeywords(keywordsString, " ");
 
                 // fix-up stage to be consistent with built variants stage

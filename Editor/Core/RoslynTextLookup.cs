@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Unity.ProjectAuditor.Editor.Utils;
+using UnityEditor.Experimental;
+using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace Unity.ProjectAuditor.Editor.Core
@@ -36,8 +38,8 @@ namespace Unity.ProjectAuditor.Editor.Core
         {
             m_StringLookup = new Dictionary<string, StringLookup>();
 
-            var rawDescriptors =
-                Json.DeserializeArrayFromFile<RawStringLookup>(Path.Combine(ProjectAuditor.s_DataPath, "RoslynTextLookup.json"));
+            var json = EditorResources.Load<TextAsset>(Path.Combine(ProjectAuditor.s_RulesDataPath, "RoslynTextLookup.json")).text;
+            var rawDescriptors = Json.DeserializeArray<RawStringLookup>(json);
 
             foreach (var rawDescriptor in rawDescriptors)
             {

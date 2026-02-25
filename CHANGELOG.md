@@ -4,6 +4,27 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-02-25
+
+### Fixed
+* Fix for PROFB-385; Ensure layout + repaint IMGUI passes match.
+
+### Changed
+* Rules are now loaded from the com.unity.project-auditor-rules package.
+* Removed MemoryIgnoreVoidReturn area, in favor of using a new returnType entry for filtering based on return type.
+
+## [1.0.2] - 2025-07-30
+
+### Added
+* New check to report if Materials have Textures assigned that should be imported with the NormalMap Texture Type.
+* Domain Reload Analyzer: Support for static properties
+* Domain Reload Analyzer: Support for deregistration of non-static delegates from static events in OnDisable() methods
+
+### Fixed
+* Fix for IN-109473; update the Shader Variant table correctly based on Player.log files
+* Fix for PROFB-318; improve the check for allocating versions of functions to make it more accurate when the non-allocating version returns void.
+* Fix for PROFB-324; fix for module check when nullable is enabled for the project.
+
 ## [1.0.1] - 2025-02-06
 
 ### Changed

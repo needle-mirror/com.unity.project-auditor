@@ -10,6 +10,7 @@ namespace Unity.ProjectAuditor.Editor
     /// Describes an issue that ProjectAuditor reports in the Unity project.
     /// </summary>
     [Serializable]
+    [System.Diagnostics.DebuggerDisplay("{m_Description}")]
     public class ReportItem
     {
         [SerializeField][JsonIgnore]

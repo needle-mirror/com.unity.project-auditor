@@ -1,3 +1,6 @@
+>[!NOTE]
+> This documentation is for the Project Auditor package, compatible with Unity 6.3 and earlier. Unity versions 6.4 and later include Project Auditor built-in by default. You can open it from **Window** &gt; **Analysis** &gt; **Project Auditor**. For the documentation on the built-in Project Auditor included in Unity 6.4 and later, refer to the Unity User Manual documentation [Analyze your project with Project Auditor](https://docs.unity3d.com/6000.4/Documentation/Manual/project-auditor/analyze-project.html).
+
 # Project Auditor window reference overview
 
 To open the Project Auditor window, go to **Window > Analysis > Project Auditor**. When you open the window for the first time, it opens on the Welcome screen.
@@ -33,9 +36,9 @@ Most Project Area views allow you to filter the data to areas that you want to f
 
 | **Value** | **Description** |
 | :-------- | :-------------- |
-| **Search** | Filter the table with a string search. Type a search string into the text box and press return to display items that contain the search string.|
-| **Assembly** (available in some code-related Project Area views)| Display code issues according to what assembly they were found in. The **Select** button opens an Assembly window where you can enable the assemblies you're interested in.|
+| **Assembly** (only available in some code-related Project Area views)| Display code issues according to what assembly they were found in. The **Select** button opens an Assembly window where you can enable the assemblies you're interested in.|
 |**Areas** (only available in some Project Area views) |Filter results by specific areas. The **Select** button opens an Areas window where you can enable the areas you're interested in.|
+| **Search** | Filter the table with a string search. Type a search string into the text box and press return to display items that contain the search string.|
 |**Show** (only available in some Project Area views)| Filter the results by issue type. Some views allow you to filter issues by severity. Enable or disable the checkboxes to include these issues.|
 
 ![](images/assemblies.png)<br/>_Assemblies window_
@@ -46,12 +49,12 @@ Each table contains the following controls so you can adjust how Project Auditor
 
 | **Control** | **Description** |
 | :---- | :---- |
-| **Refresh (⟳)** | Re-run the analysis for this Project Area. |
+| **Analyze Now (⟳)** | Re-run the analysis for this Project Area. |
 | **Show/Hide Hierarchy** | Enable to display the table as a hierarchy according to the **Group By** dropdown. |
 | **Group By** (only available when Show Hierarchy is enabled) | Select how to group the issues in the table. |
 | **Collapse All** (only available when Show Hierarchy is enabled) | Collapse all expanded groups. |
 | **Expand All** (only available when Show Hierarchy is enabled) | Expand all groups.|
-| **Export** | Export the issues in the table to a comma-separated value (.csv) file. Choose from the following options:<br/><br/>- **All**: Export all issues in the current view.<br/>- **Filtered**: Export only the issues that are visible with the current filter settings.<br/>- **Selected**: Export only the selected issues. |
+| **Export** | Export the issues in the table to a comma-separated value (.csv) file. Choose from the following options:<ul><li>**All**: Export all issues in the current view.</li><li> **Filtered**: Export only the issues that are visible with the current filter settings.</li><li> **Selected**: Export only the selected issues.</li></ul> |
 
 ## Additional resources
 

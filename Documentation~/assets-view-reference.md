@@ -1,16 +1,19 @@
+>[!NOTE]
+> This documentation is for the Project Auditor package, compatible with Unity 6.3 and earlier. Unity versions 6.4 and later include Project Auditor built-in by default. You can open it from **Window** &gt; **Analysis** &gt; **Project Auditor**. For the documentation on the built-in Project Auditor included in Unity 6.4 and later, refer to the Unity User Manual documentation [Analyze your project with Project Auditor](https://docs.unity3d.com/6000.4/Documentation/Manual/project-auditor/analyze-project.html).
+
 # Assets view reference
 
 The Assets view displays issues and information related to the assets in your project. You can select from the following views:
 
-* [Asset Issues](#asset-issues-view)
-* [Textures](#textures-view)
-* [Sprite Atlases](#sprite-atlases-view)
-* [Meshes](#meshes-view)
-* [Audio Clips](#audio-clips-view)
-* [Animator Controllers](#animator-controllers-view)
-* [Animation Clips](#animation-clips-view)
-* [Avatars](#avatars-view)
-* [Avatar Masks](#avatar-masks-view)
+* [Asset Issues view](#asset-issues-view)
+* [Textures view](#textures-view)
+* [Sprite Atlases view](#sprite-atlases-view)
+* [Meshes view](#meshes-view)
+* [Audio Clips view](#audio-clips-view)
+* [Animator Controllers view](#animator-controllers-view)
+* [Animation Clips view](#animation-clips-view)
+* [Avatars view](#avatars-view)
+* [Avatar Masks view](#avatar-masks-view)
 
 ## Asset Issues view
 

@@ -1,9 +1,8 @@
-using System;
-using System.Collections.Generic;
-using Unity.ProjectAuditor.Editor.UI.Framework;
-using UnityEditor;
 using UnityEditor.IMGUI.Controls;
-using UnityEngine;
+
+#if UNITY_6000_2_OR_NEWER
+using TreeViewState = UnityEditor.IMGUI.Controls.TreeViewState<int>;
+#endif
 
 namespace Unity.ProjectAuditor.Editor.UI.Framework
 {
