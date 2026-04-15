@@ -43,6 +43,17 @@ namespace Unity.ProjectAuditor.Editor.Modules
         Num
     }
 
+    internal enum ObsoleteApiProperty
+    {
+        Recommendation,
+        AutoUpgradable,
+        WarningSince,
+        ErrorSince,
+        RemovedIn,
+        ObsoleteSince,
+        Num
+    };
+
     class CodeModule : ModuleWithAnalyzers<CodeModuleInstructionAnalyzer>
     {
         static readonly IssueLayout k_AssemblyLayout = new IssueLayout
@@ -112,8 +123,21 @@ namespace Unity.ProjectAuditor.Editor.Modules
             }
         };
 
+        static readonly IssueLayout k_ObsoleteApiLayout = new IssueLayout
+        {
+            Category = IssueCategory.ObsoleteAPI,
+            Properties = new[]
+            {
+                new PropertyDefinition { Type = PropertyType.Description, Name = "Issue", LongName = "Issue description", MaxAutoWidth = 800 },
+                new PropertyDefinition { Type = PropertyTypeUtil.FromCustom(ObsoleteApiProperty.AutoUpgradable), Format = PropertyFormat.Bool, Name = "Upgradable", LongName = "Automatically upgradable" },
+                new PropertyDefinition { Type = PropertyTypeUtil.FromCustom(ObsoleteApiProperty.ObsoleteSince), Format = PropertyFormat.String, Name = "Obsolete", LongName = "Obsolete since version", IsDefaultGroup = true },
+                new PropertyDefinition { Type = PropertyTypeUtil.FromCustom(ObsoleteApiProperty.RemovedIn), Format = PropertyFormat.String, Name = "Removed", LongName = "Removed in version" }
+            }
+        };
+
         List<OpCode> m_OpCodes;
-        List<CodeModuleInstructionAnalyzer>[] m_OpCodeAnalyzers = new List<CodeModuleInstructionAnalyzer>[ushort.MaxValue];
+        List<int>[] m_OpCodeAnalyzers = new List<int>[ushort.MaxValue];
+        CodeModuleInstructionAnalyzer[] m_CompatibleAnalyzers;
 
         Thread m_AssemblyAnalysisThread;
 
@@ -128,7 +152,8 @@ namespace Unity.ProjectAuditor.Editor.Modules
             k_AssemblyLayout,
             k_PrecompiledAssemblyLayout,
             k_CompilerMessageLayout,
-            k_DomainReloadIssueLayout
+            k_DomainReloadIssueLayout,
+            k_ObsoleteApiLayout
         };
 
         public override void Initialize()
@@ -168,20 +193,18 @@ namespace Unity.ProjectAuditor.Editor.Modules
                 Params = analysisParams
             };
 
-            var compatibleAnalyzers = GetCompatibleAnalyzers(analysisParams);
+            m_CompatibleAnalyzers = GetCompatibleAnalyzers(analysisParams);
             for (var i = 0; i < m_OpCodeAnalyzers.Length; i++)
             {
                 m_OpCodeAnalyzers[i] = null;
             }
             foreach (var opCode in m_OpCodes)
             {
-                var opCodeAnalyzers = new List<CodeModuleInstructionAnalyzer>();
-                foreach (var analyzer in compatibleAnalyzers)
+                var opCodeAnalyzers = new List<int>();
+                for (int analyzerIndex = 0; analyzerIndex < m_CompatibleAnalyzers.Length; analyzerIndex++)
                 {
-                    if (analyzer.opCodes.Contains(opCode))
-                    {
-                        opCodeAnalyzers.Add(analyzer);
-                    }
+                    if (m_CompatibleAnalyzers[analyzerIndex].opCodes.Contains(opCode))
+                        opCodeAnalyzers.Add(analyzerIndex);
                 }
                 m_OpCodeAnalyzers[(ushort)opCode.Value] = opCodeAnalyzers;
             }
@@ -378,6 +401,10 @@ namespace Unity.ProjectAuditor.Editor.Modules
             using (var assembly = AssemblyDefinition.ReadAssembly(assemblyInfo.Path,
                 new ReaderParameters {ReadSymbols = true, AssemblyResolver = assemblyResolver, MetadataResolver = new MetadataResolverWithCache(assemblyResolver)}))
             {
+                object[] assemblyUserData = new object[m_CompatibleAnalyzers.Length];
+                for (int analyzerIndex = 0; analyzerIndex < m_CompatibleAnalyzers.Length; analyzerIndex++)
+                    assemblyUserData[analyzerIndex] = m_CompatibleAnalyzers[analyzerIndex].OnAnalyzeAssembly();
+
                 foreach (var typeDefinition in MonoCecilHelper.AggregateAllTypeDefinitions(assembly.MainModule.Types))
                 {
                     Profiler.BeginSample(typeDefinition.Name);
@@ -398,7 +425,7 @@ namespace Unity.ProjectAuditor.Editor.Modules
 
                         var isPerformanceCriticalContext = isPerformanceCriticalType && IsPerformanceCriticalMethod(methodDefinition);
 
-                        AnalyzeMethodBody(assemblyInfo, methodDefinition, isPerformanceCriticalContext, onCallFound, onIssueFound);
+                        AnalyzeMethodBody(assemblyInfo, methodDefinition, assemblyUserData, isPerformanceCriticalContext, onCallFound, onIssueFound);
                     }
                     Profiler.EndSample();
                 }
@@ -407,7 +434,7 @@ namespace Unity.ProjectAuditor.Editor.Modules
             Profiler.EndSample();
         }
 
-        void AnalyzeMethodBody(AssemblyInfo assemblyInfo, MethodDefinition caller, bool perfCriticalContext, Action<CallInfo> onCallFound, Action<ReportItem> onIssueFound)
+        void AnalyzeMethodBody(AssemblyInfo assemblyInfo, MethodDefinition caller, object[] assemblyUserData, bool perfCriticalContext, Action<CallInfo> onCallFound, Action<ReportItem> onIssueFound)
         {
             Profiler.BeginSample("CodeModule.AnalyzeMethodBody");
 
@@ -417,6 +444,28 @@ namespace Unity.ProjectAuditor.Editor.Modules
             };
 
             var sequencePoints = caller.DebugInformation.SequencePoints;
+
+            for (int analyzerIndex = 0; analyzerIndex < m_CompatibleAnalyzers.Length; analyzerIndex++)
+            {
+                var methodContext = new MethodAnalysisContext
+                {
+                    MethodDefinition = caller,
+                    AssemblyUserData = assemblyUserData[analyzerIndex]
+                };
+
+                var reportItemBuilder = m_CompatibleAnalyzers[analyzerIndex].OnAnalyzeMethodBody(methodContext);
+                if (reportItemBuilder != null)
+                {
+                    var s = sequencePoints[0];
+
+                    reportItemBuilder.WithDependencies(callerNode); // set root
+                    reportItemBuilder.WithLocation(new Location(() => AssemblyInfoProvider.ResolveAssetPath(assemblyInfo, s.Document.Url), s.IsHidden ? 0 : s.StartLine));
+                    reportItemBuilder.WithCustomProperties(new[] { assemblyInfo.Name });
+
+                    onIssueFound(reportItemBuilder);
+                }
+            }
+
             var lastSequencePointIndex = 0;
             var instructions = caller.Body.Instructions;
             for (var i = 0; i < instructions.Count; i++)
@@ -488,14 +537,13 @@ namespace Unity.ProjectAuditor.Editor.Modules
                 foreach (var analyzer in analyzers)
                 {
                     Profiler.BeginSample(analyzer.GetType().Name);
-                    var reportItemBuilder = analyzer.Analyze(context);
-                    if (reportItemBuilder != null)
+                    context.AssemblyUserData = assemblyUserData[analyzer];
+                    foreach (var reportItemBuilder in m_CompatibleAnalyzers[analyzer].Analyze(context))
                     {
-                        reportItemBuilder.WithDependencies(callerNode); // set root
-                        reportItemBuilder.WithLocation(location);
-                        reportItemBuilder.WithCustomProperties(new object[(int)CodeProperty.Num] {assemblyInfo.Name});
-
-                        onIssueFound(reportItemBuilder);
+                        onIssueFound(reportItemBuilder
+                            .WithDependencies(callerNode) // set root
+                            .WithLocation(location)
+                            .WithCustomProperties(new object[(int)CodeProperty.Num] { assemblyInfo.Name }));
                     }
                     Profiler.EndSample();
                 }

@@ -35,6 +35,11 @@ namespace Unity.ProjectAuditor.Editor.Core
             m_Issue = new ReportItem(category, description);
         }
 
+        internal ReportItemBuilder(IssueCategory category, string id, string description, ReportItem srcItem)
+        {
+            m_Issue = srcItem.Clone(category, id, description);
+        }
+
         /// <summary>
         /// Initialize all custom properties to the same value.
         /// </summary>
@@ -139,6 +144,17 @@ namespace Unity.ProjectAuditor.Editor.Core
         public ReportItemBuilder WithSeverity(Severity severity)
         {
             m_Issue.Severity = severity;
+            return this;
+        }
+
+        /// <summary>
+        /// Mark this issue as being an upgrade problem.
+        /// </summary>
+        /// <param name="properties">Upgrade properties</param>
+        /// <returns>The ReportItemBuilder object with the upgrade data added</returns>
+        public ReportItemBuilder WithUpgradeProperties(string[] properties)
+        {
+            m_Issue.UpgradeProperties = properties;
             return this;
         }
     }

@@ -1,9 +1,26 @@
 using System.Collections.Generic;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using Unity.ProjectAuditor.Editor.AssemblyUtils;
 
 namespace Unity.ProjectAuditor.Editor.Core
 {
+    /// <summary>
+    /// A context object passed by CodeModule to a CodeModuleInstructionAnalyzer's Analyze() method.
+    /// </summary>
+    internal class MethodAnalysisContext : AnalysisContext
+    {
+        /// <summary>
+        /// A Mono.Cecil Method Definition containing information about the current method being analyzed.
+        /// </summary>
+        public MethodDefinition MethodDefinition;
+
+        /// <summary>
+        /// Custom metadata that an analyzer can setup for each Assembly.
+        /// </summary>
+        public object AssemblyUserData;
+    }
+
     /// <summary>
     /// A context object passed by CodeModule to a CodeModuleInstructionAnalyzer's Analyze() method.
     /// </summary>
@@ -18,6 +35,16 @@ namespace Unity.ProjectAuditor.Editor.Core
         /// A Mono.Cecil Instruction containing information about the current code instruction being analyzed.
         /// </summary>
         public Instruction Instruction;
+
+        /// <summary>
+        /// Assembly the instruction belongs to.
+        /// </summary>
+        internal AssemblyInfo AssemblyInfo;
+
+        /// <summary>
+        /// Custom metadata that an analyzer can setup for each Assembly.
+        /// </summary>
+        internal object AssemblyUserData;
     }
 
     /// <summary>
@@ -48,6 +75,22 @@ namespace Unity.ProjectAuditor.Editor.Core
         /// will add further information including the DependencyNode, Location and assembly name and add the resulting
         /// ReportItem to the report.
         /// </remarks>
-        public abstract ReportItemBuilder Analyze(InstructionAnalysisContext context);
+        public abstract IEnumerable<ReportItemBuilder> Analyze(InstructionAnalysisContext context);
+
+        /// <summary>
+        /// Implement this method to store custom per-assembly data
+        /// </summary>
+        internal virtual object OnAnalyzeAssembly()
+        {
+            return null;
+        }
+
+        /// <summary>
+        /// Implement this method to store custom per-method data (requires allocating data first via OnAnalyzeAssembly)
+        /// </summary>
+        internal virtual ReportItemBuilder OnAnalyzeMethodBody(MethodAnalysisContext context)
+        {
+            return null;
+        }
     }
 }

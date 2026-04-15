@@ -48,7 +48,7 @@ namespace Unity.ProjectAuditor.Editor.InstructionAnalyzers
             m_NamespaceOrClassDescriptors = descriptors.Where(descriptor => descriptor.Method.Equals("*")).ToDictionary(d => d.Type);
         }
 
-        public override ReportItemBuilder Analyze(InstructionAnalysisContext context)
+        public override IEnumerable<ReportItemBuilder> Analyze(InstructionAnalysisContext context)
         {
             var callee = (MethodReference)context.Instruction.Operand;
             var description = string.Empty;
@@ -73,14 +73,14 @@ namespace Unity.ProjectAuditor.Editor.InstructionAnalyzers
 
                 List<Descriptor> descriptors;
                 if (!m_Descriptors.TryGetValue(methodName, out descriptors))
-                    return null;
+                    yield break;
 
                 Profiler.BeginSample("BuiltinCallAnalyzer.FindDescriptor");
                 descriptor = descriptors.Find(d => MonoCecilHelper.IsOrInheritedFrom(declaringType, d.Type));
                 Profiler.EndSample();
 
                 if (descriptor == null)
-                    return null;
+                    yield break;
 
                 if (!string.IsNullOrEmpty(descriptor.ReturnType))
                 {
@@ -91,12 +91,12 @@ namespace Unity.ProjectAuditor.Editor.InstructionAnalyzers
                         if (not)
                         {
                             if (callee.MethodReturnType.ReturnType.MetadataType == (MetadataType)returnTypeEnum)
-                                return null;
+                                yield break;
                         }
                         else
                         {
                             if (callee.MethodReturnType.ReturnType.MetadataType != (MetadataType)returnTypeEnum)
-                                return null;
+                                yield break;
                         }
                     }
                 }
@@ -114,7 +114,7 @@ namespace Unity.ProjectAuditor.Editor.InstructionAnalyzers
                 }
             }
 
-            return context.CreateIssue(IssueCategory.Code, descriptor.Id)
+            yield return context.CreateIssue(IssueCategory.Code, descriptor.Id)
                 .WithDescription(description);
         }
     }

@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Unity.ProjectAuditor.Editor.Core;
+using Unity.ProjectAuditor.Editor.Modules;
 using Unity.ProjectAuditor.Editor.Utils;
+
 using UnityEditor;
 using UnityEngine;
 
@@ -15,6 +17,8 @@ namespace Unity.ProjectAuditor.Editor.UI.Framework
 
         Vector2 m_DetailsScrollPos;
         Vector2 m_RecommendationScrollPos;
+
+        bool m_ShowUpgradeRecommendations;
 
         public DiagnosticView(ViewManager viewManager) : base(viewManager)
         {
@@ -37,9 +41,17 @@ namespace Unity.ProjectAuditor.Editor.UI.Framework
             bool oneSelectedID = numSelectedIDs == 1;
             bool anySelectedIDs = numSelectedIDs > 0;
             bool multipleSelectedIDs = numSelectedIDs > 1;
+            string recommendationText = "";
             if (anySelectedIDs)
             {
                 descriptor = selectedIssues[0].Id.GetDescriptor();
+                recommendationText = descriptor.Recommendation;
+
+                if (selectedIssues[0].IsUpgradeIssue)
+                {
+                    var recommendation = selectedIssues[0].UpgradeProperties[(int)UpgradeProperties.Recommendation];
+                    recommendationText += $"\n\n<i>{recommendation}</i>";
+                }
             }
 
             EditorGUILayout.BeginVertical(GUILayout.Width(LayoutSize.FoldoutWidth));
@@ -90,7 +102,7 @@ namespace Unity.ProjectAuditor.Editor.UI.Framework
                             GUILayout.Width(LayoutSize.CopyToClipboardButtonSize),
                             GUILayout.Height(LayoutSize.CopyToClipboardButtonSize)))
                         {
-                            EditorInterop.CopyToClipboard(Formatting.StripRichTextTags(descriptor.Recommendation));
+                            EditorInterop.CopyToClipboard(Formatting.StripRichTextTags(recommendationText));
                         }
                     }
                 }
@@ -195,7 +207,7 @@ namespace Unity.ProjectAuditor.Editor.UI.Framework
 
                 var wasShowingCritical = m_ViewStates.onlyCriticalIssues;
                 m_ViewStates.onlyCriticalIssues = EditorGUILayout.ToggleLeft("Only Major/Critical",
-                    m_ViewStates.onlyCriticalIssues, GUILayout.Width(170));
+                    m_ViewStates.onlyCriticalIssues, GUILayout.Width(190));
 
                 if (wasShowingCritical != m_ViewStates.onlyCriticalIssues)
                     m_ViewManager.OnMajorOrCriticalIssuesVisibilityChanged?.Invoke(m_ViewStates.onlyCriticalIssues);
@@ -206,7 +218,7 @@ namespace Unity.ProjectAuditor.Editor.UI.Framework
 
                 var wasShowingIgnored = m_Table.showIgnoredIssues;
                 m_Table.showIgnoredIssues = EditorGUILayout.ToggleLeft("Show Ignored Issues",
-                    m_Table.showIgnoredIssues, GUILayout.Width(170));
+                    m_Table.showIgnoredIssues, GUILayout.Width(190));
 
                 if (wasShowingIgnored != m_Table.showIgnoredIssues)
                 {
@@ -215,8 +227,36 @@ namespace Unity.ProjectAuditor.Editor.UI.Framework
                 }
             }
 
+            if (ObsoleteLibrary.HasAnyUpgradeVersions)
+            {
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    EditorGUILayout.LabelField(" ", GUILayout.Width(80));
+
+                    m_ShowUpgradeRecommendations = EditorGUILayout.ToggleLeft(Contents.ShowUpgradeRecommendations, m_ShowUpgradeRecommendations, GUILayout.Width(190));
+
+                    using (new EditorGUI.DisabledScope(!m_ShowUpgradeRecommendations))
+                    {
+                        EditorGUILayout.LabelField(Contents.UpgradeTargetVersionLabel, GUILayout.Width(100));
+
+                        int selectedIndex = Array.IndexOf(ObsoleteLibrary.UnityVersions, m_ViewStates.upgradeTargetVersion);
+                        if (selectedIndex == -1)
+                        {
+                            m_ViewStates.upgradeTargetVersion = ObsoleteLibrary.UnityVersions[^1];
+                            selectedIndex = ObsoleteLibrary.UnityVersions.Length - 1;
+                        }
+
+                        selectedIndex = EditorGUILayout.Popup(selectedIndex, ObsoleteLibrary.UnityVersions, GUILayout.Width(100));
+                        m_ViewStates.upgradeTargetVersion = ObsoleteLibrary.UnityVersions[selectedIndex];
+                    }
+                }
+            }
+
             if (EditorGUI.EndChangeCheck())
+            {
                 MarkDirty();
+                ClearSelection();
+            }
         }
 
         protected override void DrawInfo()
@@ -238,13 +278,14 @@ namespace Unity.ProjectAuditor.Editor.UI.Framework
 
         protected override void Export(Func<ReportItem, bool> predicate = null)
         {
-            var path = EditorUtility.SaveFilePanel("Save to CSV file", UserPreferences.LoadSavePath, string.Format("project-auditor-{0}.csv", m_Desc.Category.ToString()).ToLower(),
+            var path = EditorUtility.SaveFilePanel("Save to CSV file", UserPreferences.LoadSavePath, string.Format("project-auditor-{0}.csv", m_Desc.Category).ToLower(),
                 "csv");
             if (path.Length != 0)
             {
                 using (var exporter = new CsvExporter(m_ViewManager.Report))
                 {
-                    exporter.Export(path, m_Layout.Category, (issue) =>
+                    var issues = GetIssuesToExport();
+                    exporter.Export(path, m_Layout.Category, issues, (issue) =>
                     {
                         if (!PackageFilterMatch(issue))
                             return false;
@@ -272,6 +313,28 @@ namespace Unity.ProjectAuditor.Editor.UI.Framework
             if (!base.Match(issue))
                 return false;
 
+            if (ObsoleteLibrary.HasAnyUpgradeVersions)
+            {
+                // Check the upgrade target version, for issues that need filtering per-version
+                if (issue.IsUpgradeIssue)
+                {
+                    if (!m_ShowUpgradeRecommendations)
+                        return false;
+
+                    var targetVersion = m_ViewStates.upgradeTargetVersion;
+                    var realTargetVersionInt = Utils.Utility.VersionToInt(targetVersion);
+
+                    var upgradeProblemSince = issue.UpgradeProperties[(int)UpgradeProperties.MinVersion];
+                    var upgradeProblemUntil = issue.UpgradeProperties[(int)UpgradeProperties.MaxVersion];
+
+                    var upgradeProblemSinceInt = Utils.Utility.VersionToInt(upgradeProblemSince);
+                    var upgradeProblemUntilInt = string.IsNullOrEmpty(upgradeProblemUntil) ? int.MaxValue : Utils.Utility.VersionToInt(upgradeProblemUntil);
+
+                    if (upgradeProblemSinceInt > realTargetVersionInt || upgradeProblemUntilInt <= realTargetVersionInt)
+                        return false;
+                }
+            }
+
             if (m_Table.showIgnoredIssues)
                 return true;
 
@@ -293,6 +356,8 @@ namespace Unity.ProjectAuditor.Editor.UI.Framework
             public static readonly GUIContent Display = new GUIContent("Display", "Always show selected issue");
             public static readonly GUIContent DisplayAll = new GUIContent("Display All", "Always show selected issues");
             public static readonly GUIContent CopyToClipboard = Utility.GetIcon(Utility.IconType.CopyToClipboard);
+            public static readonly GUIContent ShowUpgradeRecommendations = new GUIContent("Upgrade Recommendations", "Show issues relating to upgrading to future Unity versions");
+            public static readonly GUIContent UpgradeTargetVersionLabel = new GUIContent("Target Version:");
         }
     }
 }

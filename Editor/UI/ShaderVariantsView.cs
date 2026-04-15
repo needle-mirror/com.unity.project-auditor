@@ -154,7 +154,7 @@ namespace Unity.ProjectAuditor.Editor.UI
             for (int i = 0; i < m_PropertyFoldouts.Length; i++)
             {
                 EditorGUILayout.BeginVertical(GUI.skin.box);
-                m_PropertyFoldouts[i].enabled = Utility.BoldFoldout(m_PropertyFoldouts[i].enabled, m_PropertyFoldouts[i].content);
+                m_PropertyFoldouts[i].enabled = Framework.Utility.BoldFoldout(m_PropertyFoldouts[i].enabled, m_PropertyFoldouts[i].content);
                 if (m_PropertyFoldouts[i].enabled)
                 {
                     const int maxHeight = 120;
@@ -271,10 +271,16 @@ namespace Unity.ProjectAuditor.Editor.UI
             var svcName = Path.GetFileNameWithoutExtension(path);
             if (path.Length != 0)
             {
-                var variants = m_Issues.Where(issue => predicate == null || predicate(issue));
+                var variants = m_Issues.Where(issue =>
+                {
+                    if (!Match(issue))
+                        return false;
+                    if (predicate != null && !predicate(issue))
+                        return false;
+                    return true;
+                });
 
-                ShadersModule.ExportVariantsToSvc(svcName, path, variants.ToArray());
-
+                ShadersModule.ExportVariantsToSvc(svcName, path, variants);
                 EditorUtility.RevealInFinder(path);
             }
         }

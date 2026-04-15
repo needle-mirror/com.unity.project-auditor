@@ -711,15 +711,21 @@ namespace Unity.ProjectAuditor.Editor.UI.Framework
             }
         }
 
+        protected virtual IReadOnlyCollection<ReportItem> GetIssuesToExport()
+        {
+            return m_ViewManager.Report.FindByCategory(m_Layout.Category);
+        }
+
         protected virtual void Export(Func<ReportItem, bool> predicate = null)
         {
-            var path = EditorUtility.SaveFilePanel("Save to CSV file", UserPreferences.LoadSavePath, string.Format("project-auditor-{0}.csv", m_Desc.Category.ToString()).ToLower(),
+            var path = EditorUtility.SaveFilePanel("Save to CSV file", UserPreferences.LoadSavePath, string.Format("project-auditor-{0}.csv", m_Desc.Category).ToLower(),
                 "csv");
             if (path.Length != 0)
             {
                 using (var exporter = new CsvExporter(m_ViewManager.Report))
                 {
-                    exporter.Export(path, m_Layout.Category, (issue) =>
+                    var issues = GetIssuesToExport();
+                    exporter.Export(path, m_Layout.Category, issues, (issue) =>
                     {
                         if (!PackageFilterMatch(issue))
                          return false;

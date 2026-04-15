@@ -1,8 +1,8 @@
 {
   "name": "com.unity.project-auditor",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "displayName": "Project Auditor",
-  "unity": "2021.3",
+  "unity": "2022.3",
   "description": "Project Auditor is a static analysis tool that analyzes assets, settings, and scripts of the Unity project and produces a report containing: Code and Settings Diagnostics, the last BuildReport, and assets information.",
   "keywords": [
     "performance",
@@ -11,21 +11,21 @@
   "dependencies": {
     "com.unity.nuget.mono-cecil": "1.10.1",
     "com.unity.nuget.newtonsoft-json": "3.2.1",
-    "com.unity.project-auditor-rules": "1.0.1"
+    "com.unity.project-auditor-rules": "1.0.3"
   },
   "relatedPackages": {
-    "com.unity.project-auditor.tests": "1.1.0"
+    "com.unity.project-auditor.tests": "2.0.0"
   },
   "_upm": {
-    "changelog": "### Fixed\n* Fix for PROFB-385; Ensure layout + repaint IMGUI passes match.\n\n### Changed\n* Rules are now loaded from the com.unity.project-auditor-rules package.\n* Removed MemoryIgnoreVoidReturn area, in favor of using a new returnType entry for filtering based on return type."
+    "changelog": "### Added\n* New Obsolete API view under Code, showing all obsolete API in Unity\n* Project Auditor raises issues for use of currently obsolete API\n* Project Auditor raises issues for use of API that will become obsolete in the future"
   },
   "upmCi": {
-    "footprint": "0b929273c027d570d6c60a73336dce3a3f2f849d"
+    "footprint": "79fc5a3f3b76a692f8963bf73daefaf1a00a3502"
   },
-  "documentationUrl": "https://docs.unity3d.com/Packages/com.unity.project-auditor@1.1/manual/index.html",
+  "documentationUrl": "https://docs.unity3d.com/Packages/com.unity.project-auditor@2.0/manual/index.html",
   "repository": {
     "url": "https://github.cds.internal.unity3d.com/unity/ProjectAuditor.git",
     "type": "git",
-    "revision": "a23d70fbc84b7d4bd8fffda034eff3bc1bac20f6"
+    "revision": "8dd90a81a28dfa6887176f01a4952743c5590663"
   }
 }

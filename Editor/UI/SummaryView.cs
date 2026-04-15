@@ -5,7 +5,7 @@ using Unity.ProjectAuditor.Editor.Core;
 using Unity.ProjectAuditor.Editor.Modules;
 using Unity.ProjectAuditor.Editor.UI.Framework;
 using Unity.ProjectAuditor.Editor.AssemblyUtils;
-using Unity.ProjectAuditor.Editor.Utils;
+using Unity.ProjectAuditor.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -135,6 +135,10 @@ namespace Unity.ProjectAuditor.Editor.UI
                 return true;
 
             if (item.WasFixed)
+                return true;
+
+            // Hide upgrade items from the Top 10
+            if (item.IsUpgradeIssue)
                 return true;
 
             if (!m_ProjectAuditorWindow.PackageFilterMatch(item))
@@ -526,7 +530,7 @@ namespace Unity.ProjectAuditor.Editor.UI
                                         GUILayout.Width(24),
                                         GUILayout.Height(24)))
                                     {
-                                        EditorInterop.CopyToClipboard(Formatting.StripRichTextTags(descriptor.Description));
+                                        EditorInterop.CopyToClipboard(Utils.Formatting.StripRichTextTags(descriptor.Description));
                                     }
                                 }
                             }
@@ -555,7 +559,7 @@ namespace Unity.ProjectAuditor.Editor.UI
                                         GUILayout.Width(24),
                                         GUILayout.Height(24)))
                                     {
-                                        EditorInterop.CopyToClipboard(Formatting.StripRichTextTags(descriptor.Recommendation));
+                                        EditorInterop.CopyToClipboard(Utils.Formatting.StripRichTextTags(descriptor.Recommendation));
                                     }
                                 }
                             }
@@ -741,7 +745,7 @@ namespace Unity.ProjectAuditor.Editor.UI
         {
             var keyValues = new[]
             {
-                new KeyValuePair<string, string>("Date and Time", Formatting.FormatDateTime(Json.DeserializeDateTime(sessionInfo.DateTime))),
+                new KeyValuePair<string, string>("Date and Time", Utils.Formatting.FormatDateTime(Utils.Json.DeserializeDateTime(sessionInfo.DateTime))),
                 new KeyValuePair<string, string>("Host Name", sessionInfo.HostName),
                 new KeyValuePair<string, string>("Host Platform", sessionInfo.HostPlatform),
                 new KeyValuePair<string, string>("Company Name", sessionInfo.CompanyName),

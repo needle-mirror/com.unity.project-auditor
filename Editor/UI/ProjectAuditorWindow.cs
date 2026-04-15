@@ -11,7 +11,7 @@ using Unity.ProjectAuditor.Editor.UI.Framework;
 using Unity.ProjectAuditor.Editor.Modules;
 using Unity.ProjectAuditor.Editor.AssemblyUtils;
 using Unity.ProjectAuditor.Editor.Core;
-using Unity.ProjectAuditor.Editor.Utils;
+using Unity.ProjectAuditor.Editor;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
@@ -138,7 +138,7 @@ namespace Unity.ProjectAuditor.Editor.UI
                     categories = new[]
                     {
                         IssueCategory.Code, IssueCategory.Assembly, IssueCategory.PrecompiledAssembly,
-                        IssueCategory.CodeCompilerMessage, IssueCategory.DomainReload
+                        IssueCategory.CodeCompilerMessage, IssueCategory.DomainReload, IssueCategory.ObsoleteAPI
                     }
                 },
                 new Tab
@@ -182,6 +182,8 @@ namespace Unity.ProjectAuditor.Editor.UI
         public bool PackageFilterMatch(ReportItem issue)
         {
             if (UserPreferences.AnalyzePackagesForIssues == true)
+                return true;
+            if (issue.Category == IssueCategory.ObsoleteAPI)
                 return true;
 
             if (issue.Location == null)
@@ -937,7 +939,7 @@ namespace Unity.ProjectAuditor.Editor.UI
             ViewDescriptor.Register(new ViewDescriptor
             {
                 Category = IssueCategory.Code,
-                DisplayName = "Code",
+                DisplayName = "Code Issues",
                 MenuLabel = "Code/Issues",
                 MenuOrder = 0,
                 ShowAssemblySelection = true,
@@ -1032,6 +1034,16 @@ namespace Unity.ProjectAuditor.Editor.UI
                 OnOpenManual = EditorInterop.OpenCodeDescriptor,
                 Type = typeof(CodeDomainReloadView),
                 AnalyticsEventId = (int)AnalyticsReporter.UIButton.DomainReload
+            });
+            ViewDescriptor.Register(new ViewDescriptor
+            {
+                Category = IssueCategory.ObsoleteAPI,
+                DisplayName = "Obsolete API Database",
+                MenuLabel = "Code/Obsolete API Database",
+                MenuOrder = 51,
+                ShowFilters = true,
+                ShowInfoPanel = true,
+                Type = typeof(ObsoleteApiView)
             });
         }
 
@@ -1837,7 +1849,7 @@ namespace Unity.ProjectAuditor.Editor.UI
                     }
                     else if (m_AreaSelectionSummary != "None")
                     {
-                        var areas = Formatting.SplitStrings(m_AreaSelectionSummary);
+                        var areas = Utils.Formatting.SplitStrings(m_AreaSelectionSummary);
                         m_AreaSelection.selection.AddRange(areas);
                         m_SelectedAreas = (Areas)Enum.Parse(typeof(Areas), m_AreaSelectionSummary);
                     }
@@ -1891,7 +1903,7 @@ namespace Unity.ProjectAuditor.Editor.UI
                 }
                 else if (m_AssemblySelectionSummary != "None")
                 {
-                    var assemblies = Formatting.SplitStrings(m_AssemblySelectionSummary)
+                    var assemblies = Utils.Formatting.SplitStrings(m_AssemblySelectionSummary)
                         .Where(assemblyName => m_AssemblyNames.Contains(assemblyName));
                     m_AssemblySelection.selection.AddRange(assemblies);
                 }

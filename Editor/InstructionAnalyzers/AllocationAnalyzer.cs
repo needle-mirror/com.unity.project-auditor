@@ -86,7 +86,7 @@ namespace Unity.ProjectAuditor.Editor.InstructionAnalyzers
             registerDescriptor(k_ParamArrayAllocationDescriptor);
         }
 
-        public override ReportItemBuilder Analyze(InstructionAnalysisContext context)
+        public override IEnumerable<ReportItemBuilder> Analyze(InstructionAnalysisContext context)
         {
             if (context.Instruction.OpCode == OpCodes.Call || context.Instruction.OpCode == OpCodes.Callvirt)
             {
@@ -96,34 +96,32 @@ namespace Unity.ProjectAuditor.Editor.InstructionAnalyzers
                     var lastParam = callee.Parameters.Last();
                     if (lastParam.HasCustomAttributes && lastParam.CustomAttributes.Any(a => a.AttributeType.FastFullName().GetHashCode() == k_ParamArrayAtributeHashCode))
                     {
-                        return context.CreateIssue(IssueCategory.Code, k_ParamArrayAllocationDescriptor.Id, lastParam.ParameterType.Name, lastParam.Name);
+                        yield return context.CreateIssue(IssueCategory.Code, k_ParamArrayAllocationDescriptor.Id, lastParam.ParameterType.Name, lastParam.Name);
                     }
                 }
-                return null;
             }
-
-            if (context.Instruction.OpCode == OpCodes.Newobj)
+            else if (context.Instruction.OpCode == OpCodes.Newobj)
             {
                 var methodReference = (MethodReference)context.Instruction.Operand;
                 var typeReference = methodReference.DeclaringType;
                 if (typeReference.IsValueType)
-                    return null;
+                    yield break;
 
                 var isClosure = typeReference.Name.StartsWith("<>c__DisplayClass", StringComparison.Ordinal);
                 if (isClosure)
                 {
-                    return context.CreateIssue(IssueCategory.Code, k_ClosureAllocationDescriptor.Id, context.MethodDefinition.DeclaringType.Name, context.MethodDefinition.Name);
+                    yield return context.CreateIssue(IssueCategory.Code, k_ClosureAllocationDescriptor.Id, context.MethodDefinition.DeclaringType.Name, context.MethodDefinition.Name);
                 }
                 else
                 {
-                    return context.CreateIssue(IssueCategory.Code, k_ObjectAllocationDescriptor.Id, typeReference.FastFullName());
+                    yield return context.CreateIssue(IssueCategory.Code, k_ObjectAllocationDescriptor.Id, typeReference.FastFullName());
                 }
             }
             else // OpCodes.Newarr
             {
                 var typeReference = (TypeReference)context.Instruction.Operand;
 
-                return context.CreateIssue(IssueCategory.Code, k_ArrayAllocationDescriptor.Id, typeReference.Name);
+                yield return context.CreateIssue(IssueCategory.Code, k_ArrayAllocationDescriptor.Id, typeReference.Name);
             }
         }
     }

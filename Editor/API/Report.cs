@@ -91,7 +91,7 @@ namespace Unity.ProjectAuditor.Editor
     [Serializable]
     public sealed class Report
     {
-        const string k_CurrentVersion = "0.2";
+        const string k_CurrentVersion = "0.3";
         const string k_SaveFileHeader = "PROJECT_AUDITOR_REPORT";
 
         [JsonProperty("version")][SerializeField]

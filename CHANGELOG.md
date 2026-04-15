@@ -4,6 +4,13 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 2026-04-15
+
+### Added
+* New Obsolete API view under Code, showing all obsolete API in Unity
+* Project Auditor raises issues for use of currently obsolete API
+* Project Auditor raises issues for use of API that will become obsolete in the future
+
 ## [1.1.0] - 2026-02-25
 
 ### Fixed

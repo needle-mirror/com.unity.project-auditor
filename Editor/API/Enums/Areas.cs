@@ -66,6 +66,11 @@ namespace Unity.ProjectAuditor.Editor
         /// </summary>
         Support = 1 << 9,
 
+        /// <summary>
+        /// Upgrade. For example, issues that may prevent you from upgrading to a newer version of Unity.
+        /// </summary>
+        Upgrade = 1 << 10,
+
         // Add new items in alphabetical order and adjust the values (including "All") accordingly.
         // Areas are serialised as strings, so it doesn't matter if the values change between package versions so long as old reports have been saved.
 

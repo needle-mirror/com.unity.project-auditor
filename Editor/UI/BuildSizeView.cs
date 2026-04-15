@@ -63,7 +63,7 @@ namespace Unity.ProjectAuditor.Editor.UI
             {
                 EditorGUILayout.Space();
 
-                m_ViewStates.info2 = Utility.BoldFoldout(m_ViewStates.info2, SizesFoldout);
+                m_ViewStates.info2 = Framework.Utility.BoldFoldout(m_ViewStates.info2, SizesFoldout);
                 if (m_ViewStates.info2)
                 {
                     EditorGUI.indentLevel++;

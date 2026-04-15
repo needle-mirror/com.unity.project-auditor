@@ -7,6 +7,27 @@ using UnityEngine;
 namespace Unity.ProjectAuditor.Editor
 {
     /// <summary>
+    /// The various supported upgrade properties in a ReportItem.
+    /// </summary>
+    public enum UpgradeProperties
+    {
+        /// <summary>
+        /// The minimum version this issue applies to.
+        /// </summary>
+        MinVersion,
+
+        /// <summary>
+        /// The maximum version this issue applies to.
+        /// </summary>
+        MaxVersion,
+
+        /// <summary>
+        /// The recommended way to fix this upgrade issue.
+        /// </summary>
+        Recommendation
+    }
+
+    /// <summary>
     /// Describes an issue that ProjectAuditor reports in the Unity project.
     /// </summary>
     [Serializable]
@@ -33,6 +54,9 @@ namespace Unity.ProjectAuditor.Editor
 
         [SerializeField]
         string[] m_CustomProperties;
+
+        [SerializeField]
+        string[] upgradeProperties;
 
         /// <summary>
         /// Determines whether the Issue was fixed. Only used if the ReportItem represents an Issue.
@@ -221,6 +245,20 @@ namespace Unity.ProjectAuditor.Editor
             set => m_Severity = (Severity)Enum.Parse(typeof(Severity), value);
         }
 
+        /// <summary>
+        /// Determines whether this issue is an upgrade issue.
+        /// </summary>
+        public bool IsUpgradeIssue => UpgradeProperties?.Length > 0;
+
+        /// <summary>
+        /// Properties relating to upgrade issues
+        /// </summary>
+        public string[] UpgradeProperties
+        {
+            get => upgradeProperties;
+            internal set => upgradeProperties = value;
+        }
+
         [JsonConstructor]
         internal ReportItem()
         {
@@ -267,6 +305,15 @@ namespace Unity.ProjectAuditor.Editor
             m_Description = description;
             m_Severity = Severity.Default;
             IsIgnored = false;
+        }
+
+        internal ReportItem Clone(IssueCategory category, string id, string description)
+        {
+            var result = MemberwiseClone() as ReportItem;
+            result.m_DescriptorId = new DescriptorId(id);
+            result.m_Category = category;
+            result.m_Description = description;
+            return result;
         }
 
         /// <summary>
