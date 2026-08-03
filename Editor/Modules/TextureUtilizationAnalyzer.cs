@@ -8,6 +8,7 @@ using UnityEngine;
 
 namespace Unity.ProjectAuditor.Editor.Modules
 {
+    [MigratedToRulesPackage(2)]
     class TextureUtilizationAnalyzer : TextureModuleAnalyzer
     {
         internal const string PAA0005 = nameof(PAA0005);
@@ -24,7 +25,7 @@ namespace Unity.ProjectAuditor.Editor.Modules
         {
             IsEnabledByDefault = false,
             MessageFormat = "Texture '{0}' is a solid color and not 1x1 size",
-            Fixer = (issue, analysisParams) => { ShrinkSolidTexture(issue.RelativePath); }
+            Fixer = (issue, analysisParams) => { return ShrinkSolidTexture(issue.RelativePath); }
         };
 
         // NOTE:  This is only here to run the same analysis without a quick fix button.  Clean up when we either have appropriate quick fix for other dimensions or improved Fixer support.
@@ -84,7 +85,7 @@ namespace Unity.ProjectAuditor.Editor.Modules
             }
         }
 
-        internal static void ShrinkSolidTexture(string path)
+        internal static bool ShrinkSolidTexture(string path)
         {
             var textureImporter = AssetImporter.GetAtPath(path) as TextureImporter;
             if (textureImporter != null)
@@ -107,6 +108,8 @@ namespace Unity.ProjectAuditor.Editor.Modules
                 textureImporter.isReadable = originalValue;
                 textureImporter.SaveAndReimport();
             }
+
+            return true;
         }
     }
 }

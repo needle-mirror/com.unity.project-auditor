@@ -5,6 +5,7 @@ using UnityEngine;
 
 namespace Unity.ProjectAuditor.Editor.SettingsAnalysis
 {
+    [MigratedToRulesPackage(2)]
     class QualitySettingsAnalyzer : SettingsModuleAnalyzer
     {
         internal const string PAS0018 = nameof(PAS0018);
@@ -60,6 +61,7 @@ namespace Unity.ProjectAuditor.Editor.SettingsAnalysis
             Fixer = (issue, analysisParams) =>
             {
                 EnableStreamingMipmap(issue.GetCustomPropertyInt32(0));
+                return true;
             },
 
             DocumentationUrl = "https://docs.unity3d.com/Manual/TextureStreaming.html",

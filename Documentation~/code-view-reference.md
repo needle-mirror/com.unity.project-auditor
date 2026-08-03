@@ -24,8 +24,6 @@ There are several known limitations in Project Auditor's code analysis:
 ## Code view
 The Code Issues view reports all C# script-related issues. For each issue, this view also provides an explanation of the problem and a recommended course of action to resolve the issue.
 
-![](images/code-view.png)<br/>_Project Auditor window with the Code view open_
-
 ### Filters
 
 Use the filters to filter the list of issues to areas you're interested in. For more information, refer to [Filter controls](project-auditor-window-reference.md#filter-controls).

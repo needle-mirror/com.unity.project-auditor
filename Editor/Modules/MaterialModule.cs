@@ -58,6 +58,7 @@ namespace Unity.ProjectAuditor.Editor.Modules
                 if (progress?.IsCancelled ?? false)
                     return AnalysisResult.Cancelled;
 
+                context.AssetPath = assetPath;
                 context.Material = AssetDatabase.LoadAssetAtPath<Material>(assetPath);
 
                 if (string.IsNullOrEmpty(context.Material.name))

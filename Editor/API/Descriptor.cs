@@ -78,7 +78,7 @@ namespace Unity.ProjectAuditor.Editor
         /// Optional Auto-Fixer
         /// </summary>
         [JsonIgnore]
-        public Action<ReportItem, AnalysisParams> Fixer;
+        public Func<ReportItem, AnalysisParams, bool> Fixer;
 
         /// <summary>
         /// Name of the type (namespace and class/struct) of a known code API issue.

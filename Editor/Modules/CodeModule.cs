@@ -27,6 +27,7 @@ namespace Unity.ProjectAuditor.Editor.Modules
     enum PrecompiledAssemblyProperty
     {
         RoslynAnalyzer = 0,
+        TargetFramework,
         Num
     }
 
@@ -54,7 +55,7 @@ namespace Unity.ProjectAuditor.Editor.Modules
         Num
     };
 
-    class CodeModule : ModuleWithAnalyzers<CodeModuleInstructionAnalyzer>
+    class CodeModule : ModuleWithAnalyzers<CodeModuleAnalyzer>
     {
         static readonly IssueLayout k_AssemblyLayout = new IssueLayout
         {
@@ -76,6 +77,7 @@ namespace Unity.ProjectAuditor.Editor.Modules
             {
                 new PropertyDefinition { Type = PropertyType.Description, Name = "Assembly Name"},
                 new PropertyDefinition { Type = PropertyTypeUtil.FromCustom(PrecompiledAssemblyProperty.RoslynAnalyzer), Format = PropertyFormat.Bool, Name = "Roslyn Analyzer"},
+                new PropertyDefinition { Type = PropertyTypeUtil.FromCustom(PrecompiledAssemblyProperty.TargetFramework), Format = PropertyFormat.String, Name = "Target Framework"},
                 new PropertyDefinition { Type = PropertyType.Directory, Name = "Path", IsDefaultGroup = true},
             }
         };
@@ -137,7 +139,8 @@ namespace Unity.ProjectAuditor.Editor.Modules
 
         List<OpCode> m_OpCodes;
         List<int>[] m_OpCodeAnalyzers = new List<int>[ushort.MaxValue];
-        CodeModuleInstructionAnalyzer[] m_CompatibleAnalyzers;
+        List<CodeModuleInstructionAnalyzer> m_CodeAnalyzers;
+        List<CodeModulePrecompiledAssemblyAnalyzer> m_PrecompiledAssemblyAnalyzers;
 
         Thread m_AssemblyAnalysisThread;
 
@@ -145,6 +148,8 @@ namespace Unity.ProjectAuditor.Editor.Modules
 
         // Match a whole "word", starting with UDR and ending with exactly 4 digits, e.g. UDR1234
         static readonly Regex s_RegEx = new Regex(@"\bUDR\d{4}\b");
+        static readonly Regex s_RegEx2 = new Regex(@"\bUAL\d{4}\b");
+        static readonly Regex s_RegEx3 = new Regex(@"\bPAR\d{4}\b");
 
         public override IReadOnlyCollection<IssueLayout> SupportedLayouts => new IssueLayout[]
         {
@@ -160,7 +165,7 @@ namespace Unity.ProjectAuditor.Editor.Modules
         {
             base.Initialize();
 
-            m_OpCodes = GetAnalyzers().Select(a => a.opCodes).SelectMany(c => c).Distinct().ToList();
+            m_OpCodes = GetAnalyzers().OfType<CodeModuleInstructionAnalyzer>().Select(a => a.opCodes).SelectMany(c => c).Distinct().ToList();
 
             ProjectIssueExtensions.AddCustomComparer(IssueCategory.Assembly, PropertyTypeUtil.FromCustom(AssemblyProperty.CompileTime),
                 (a, b) =>
@@ -193,7 +198,17 @@ namespace Unity.ProjectAuditor.Editor.Modules
                 Params = analysisParams
             };
 
-            m_CompatibleAnalyzers = GetCompatibleAnalyzers(analysisParams);
+            var compatibleAnalyzers = GetCompatibleAnalyzers(analysisParams);
+            m_CodeAnalyzers = new List<CodeModuleInstructionAnalyzer>();
+            m_PrecompiledAssemblyAnalyzers = new List<CodeModulePrecompiledAssemblyAnalyzer>();
+            foreach (var analyzer in compatibleAnalyzers)
+            {
+                if (analyzer is CodeModuleInstructionAnalyzer codeAnalyzer)
+                    m_CodeAnalyzers.Add(codeAnalyzer);
+                else if (analyzer is CodeModulePrecompiledAssemblyAnalyzer precompiledAssemblyAnalyzer)
+                    m_PrecompiledAssemblyAnalyzers.Add(precompiledAssemblyAnalyzer);
+            }
+
             for (var i = 0; i < m_OpCodeAnalyzers.Length; i++)
             {
                 m_OpCodeAnalyzers[i] = null;
@@ -201,38 +216,26 @@ namespace Unity.ProjectAuditor.Editor.Modules
             foreach (var opCode in m_OpCodes)
             {
                 var opCodeAnalyzers = new List<int>();
-                for (int analyzerIndex = 0; analyzerIndex < m_CompatibleAnalyzers.Length; analyzerIndex++)
+                for (int analyzerIndex = 0; analyzerIndex < m_CodeAnalyzers.Count; analyzerIndex++)
                 {
-                    if (m_CompatibleAnalyzers[analyzerIndex].opCodes.Contains(opCode))
+                    if (m_CodeAnalyzers[analyzerIndex].opCodes.Contains(opCode))
                         opCodeAnalyzers.Add(analyzerIndex);
                 }
                 m_OpCodeAnalyzers[(ushort)opCode.Value] = opCodeAnalyzers;
             }
 
-            var precompiledAssemblies = AssemblyInfoProvider.GetPrecompiledAssemblyPaths(PrecompiledAssemblyTypes.All)
-                .Select(assemblyPath => (ReportItem)context.CreateInsight(IssueCategory.PrecompiledAssembly, Path.GetFileNameWithoutExtension(assemblyPath))
-                    .WithCustomProperties(new object[(int)PrecompiledAssemblyProperty.Num]
-                    {
-                        false
-                    })
-                    .WithLocation(assemblyPath))
-                .ToArray();
-            if (precompiledAssemblies.Any())
-                analysisParams.OnIncomingIssues(precompiledAssemblies);
+            var precompiledAssemblyPaths = AssemblyInfoProvider.GetPrecompiledAssemblyPaths(PrecompiledAssemblyTypes.All);
+            var precompiledAssemblyIssues = new List<ReportItem>(precompiledAssemblyPaths.Count);
+            AnalyzePrecompiledAssemblies(analysisParams, precompiledAssemblyPaths, precompiledAssemblyIssues.Add);
+            if (precompiledAssemblyIssues.Count > 0)
+                analysisParams.OnIncomingIssues(precompiledAssemblyIssues);
 
             // find all roslyn analyzer DLLs by label
-            var roslynAnalyzerAssets = AssetDatabase.FindAssets("l:RoslynAnalyzer").Select(AssetDatabase.GUIDToAssetPath).ToList();
+            var roslynAnalyzerAssets = AssetDatabase.FindAssets("l:RoslynAnalyzer").Select(AssetDatabase.GUIDToAssetPath).ToHashSet();
 
-            // find all roslyn analyzers packaged with Project Auditor
-            if (Directory.Exists($"{ProjectAuditorPackage.Path}/RoslynAnalyzers"))
-            {
-                var assetPaths = AssetDatabase.FindAssets("", new[] { $"{ProjectAuditorPackage.Path}/RoslynAnalyzers" }).Select(AssetDatabase.GUIDToAssetPath);
-                foreach (var assetPath in assetPaths)
-                {
-                    if (assetPath.EndsWith(".dll"))
-                        roslynAnalyzerAssets.Add(assetPath);
-                }
-            }
+            // find all roslyn analyzers packaged with Project Auditor and the rule package
+            FindRoslynAnalyzers(ProjectAuditorRulesPackage.Path, roslynAnalyzerAssets);
+            FindRoslynAnalyzers(ProjectAuditorPackage.Path, roslynAnalyzerAssets);
 
             // report all roslyn analyzers as PrecompiledAssembly issues
             var roslynAnalyzerIssues = roslynAnalyzerAssets
@@ -241,7 +244,8 @@ namespace Unity.ProjectAuditor.Editor.Modules
                 Path.GetFileNameWithoutExtension(roslynAnalyzerDllPath))
                 .WithCustomProperties(new object[(int)PrecompiledAssemblyProperty.Num]
                 {
-                    true
+                    true,
+                    k_UnknownTargetFramework
                 })
                 .WithLocation(roslynAnalyzerDllPath));
 
@@ -303,7 +307,7 @@ namespace Unity.ProjectAuditor.Editor.Modules
             {
                 // remove issues if platform does not match
                 foundIssues.RemoveAll(i => i.Id.IsValid() &&
-                    !i.Id.GetDescriptor().IsApplicable(analysisParams));
+                    !i.Id.GetDescriptor().IsSupported(analysisParams));
 
                 Profiler.BeginSample("CodeModule.Audit.BuildCallHierarchies");
                 compilationPipeline.Dispose();
@@ -358,6 +362,78 @@ namespace Unity.ProjectAuditor.Editor.Modules
             return AnalysisResult.InProgress;
         }
 
+        static void FindRoslynAnalyzers(string path, HashSet<string> results)
+        {
+            if (Directory.Exists($"{path}/RoslynAnalyzers"))
+            {
+                var assetPaths = AssetDatabase.FindAssets("", new[] { $"{path}/RoslynAnalyzers" }).Select(AssetDatabase.GUIDToAssetPath);
+                foreach (var assetPath in assetPaths)
+                {
+                    if (assetPath.EndsWith(".dll"))
+                        results.Add(assetPath);
+                }
+            }
+        }
+
+        void AnalyzePrecompiledAssemblies(AnalysisParams analysisParams, List<string> precompiledAssemblyPaths, Action<ReportItem> onIssueFound)
+        {
+            foreach (var assemblyPath in precompiledAssemblyPaths)
+            {
+                var targetFramework = ReadTargetFramework(assemblyPath);
+
+                var context = new PrecompiledAssemblyAnalysisContext
+                {
+                    AssemblyPath = assemblyPath,
+                    TargetFramework = targetFramework,
+                    Params = analysisParams
+                };
+
+                onIssueFound((ReportItem)context.CreateInsight(IssueCategory.PrecompiledAssembly, Path.GetFileNameWithoutExtension(assemblyPath))
+                    .WithCustomProperties(new object[(int)PrecompiledAssemblyProperty.Num]
+                    {
+                        false,
+                        targetFramework
+                    })
+                    .WithLocation(assemblyPath));
+
+                foreach (var analyzer in m_PrecompiledAssemblyAnalyzers)
+                {
+                    foreach (var issue in analyzer.Analyze(context))
+                        onIssueFound(issue.WithLocation(assemblyPath));
+                }
+            }
+        }
+
+        const string k_UnknownTargetFramework = "Unknown";
+
+        // Reads the assembly-level TargetFrameworkAttribute (for example ".NETStandard,Version=v2.1") from a
+        // precompiled managed assembly. Returns k_UnknownTargetFramework when the attribute is absent or the file
+        // cannot be read as a managed assembly.
+        static string ReadTargetFramework(string assemblyPath)
+        {
+            try
+            {
+                using (var assembly = AssemblyDefinition.ReadAssembly(assemblyPath))
+                {
+                    foreach (var attribute in assembly.CustomAttributes)
+                    {
+                        if (attribute.AttributeType.FullName == "System.Runtime.Versioning.TargetFrameworkAttribute"
+                            && attribute.ConstructorArguments.Count > 0)
+                        {
+                            var value = attribute.ConstructorArguments[0].Value as string;
+                            return string.IsNullOrEmpty(value) ? k_UnknownTargetFramework : value;
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                // Unreadable or non-managed assembly — treat the target framework as unknown.
+            }
+
+            return k_UnknownTargetFramework;
+        }
+
         void AnalyzeAssemblies(IReadOnlyCollection<AssemblyInfo> assemblyInfos, IReadOnlyCollection<string> assemblyFilters, IReadOnlyCollection<string> assemblyDirectories, Action<CallInfo> onCallFound, Action<ReportItem> onIssueFound, Action<IProgress> onComplete, IProgress progress = null)
         {
             using (var assemblyResolver = new DefaultAssemblyResolver())
@@ -401,9 +477,9 @@ namespace Unity.ProjectAuditor.Editor.Modules
             using (var assembly = AssemblyDefinition.ReadAssembly(assemblyInfo.Path,
                 new ReaderParameters {ReadSymbols = true, AssemblyResolver = assemblyResolver, MetadataResolver = new MetadataResolverWithCache(assemblyResolver)}))
             {
-                object[] assemblyUserData = new object[m_CompatibleAnalyzers.Length];
-                for (int analyzerIndex = 0; analyzerIndex < m_CompatibleAnalyzers.Length; analyzerIndex++)
-                    assemblyUserData[analyzerIndex] = m_CompatibleAnalyzers[analyzerIndex].OnAnalyzeAssembly();
+                object[] assemblyUserData = new object[m_CodeAnalyzers.Count];
+                for (int analyzerIndex = 0; analyzerIndex < m_CodeAnalyzers.Count; analyzerIndex++)
+                    assemblyUserData[analyzerIndex] = m_CodeAnalyzers[analyzerIndex].OnAnalyzeAssembly();
 
                 foreach (var typeDefinition in MonoCecilHelper.AggregateAllTypeDefinitions(assembly.MainModule.Types))
                 {
@@ -445,7 +521,7 @@ namespace Unity.ProjectAuditor.Editor.Modules
 
             var sequencePoints = caller.DebugInformation.SequencePoints;
 
-            for (int analyzerIndex = 0; analyzerIndex < m_CompatibleAnalyzers.Length; analyzerIndex++)
+            for (int analyzerIndex = 0; analyzerIndex < m_CodeAnalyzers.Count; analyzerIndex++)
             {
                 var methodContext = new MethodAnalysisContext
                 {
@@ -453,7 +529,7 @@ namespace Unity.ProjectAuditor.Editor.Modules
                     AssemblyUserData = assemblyUserData[analyzerIndex]
                 };
 
-                var reportItemBuilder = m_CompatibleAnalyzers[analyzerIndex].OnAnalyzeMethodBody(methodContext);
+                var reportItemBuilder = m_CodeAnalyzers[analyzerIndex].OnAnalyzeMethodBody(methodContext);
                 if (reportItemBuilder != null)
                 {
                     var s = sequencePoints[0];
@@ -538,7 +614,7 @@ namespace Unity.ProjectAuditor.Editor.Modules
                 {
                     Profiler.BeginSample(analyzer.GetType().Name);
                     context.AssemblyUserData = assemblyUserData[analyzer];
-                    foreach (var reportItemBuilder in m_CompatibleAnalyzers[analyzer].Analyze(context))
+                    foreach (var reportItemBuilder in m_CodeAnalyzers[analyzer].Analyze(context))
                     {
                         onIssueFound(reportItemBuilder
                             .WithDependencies(callerNode) // set root
@@ -584,8 +660,8 @@ namespace Unity.ProjectAuditor.Editor.Modules
                         message.Code,
                         message.Message,
                         Areas.IterationTime,
-                        RoslynTextLookup.GetDescription(message.Code),
-                        RoslynTextLookup.GetRecommendation(message.Code));
+                        RoslynTextLookup.GetDescription(message.Code) + "\n\nThis is only applicable until Unity 6.5.",
+                        RoslynTextLookup.GetRecommendation(message.Code) + "\n\nIf you are upgrading to Unity 6.5 and beyond in the future, you may wish to wait until then to become compliant with Fast Enter Playmode. Otherwise, you will also need to migrate to the AutoStaticsCleanup workflow starting from Unity 6.5.");
 
                     DescriptorLibrary.RegisterDescriptor(descriptor.Id, descriptor);
 
@@ -596,7 +672,46 @@ namespace Unity.ProjectAuditor.Editor.Modules
                         {
                             message.Code,
                             assemblyInfo.Name
-                        });
+                        })
+                        .WithUpgradeProperties(new[] { null, "6000.5", message.Message });
+                }
+                else if (s_RegEx2.IsMatch(message.Code))
+                {
+                    var descriptor = new Descriptor(
+                        message.Code,
+                        "Issue with AutoStaticsCleanup",
+                        Areas.IterationTime,
+                        message.Message + "\n\nUpgrade to Unity 6.5 before fixing this.",
+                        null);
+
+                    DescriptorLibrary.RegisterDescriptor(descriptor.Id, descriptor);
+
+                    yield return context.CreateIssue(IssueCategory.DomainReload, descriptor.Id)
+                        .WithLocation(relativePath, message.Line)
+                        .WithLogLevel(CompilerMessageTypeToLogLevel(message.Type))
+                        .WithCustomProperties(new object[(int)CompilerMessageProperty.Num]
+                        {
+                            message.Code,
+                            assemblyInfo.Name
+                        })
+                        .WithUpgradeProperties(new[] { "6000.5", null, message.Message });
+                }
+                else if (s_RegEx3.IsMatch(message.Code))
+                {
+                    var descriptor = new Descriptor(
+                        message.Code,
+                        message.Message,
+                        Areas.Upgrade,
+                        message.Message,
+                        "");
+
+                    DescriptorLibrary.RegisterDescriptor(descriptor.Id, descriptor);
+
+                    yield return context.CreateIssue(IssueCategory.Code, descriptor.Id)
+                        .WithLocation(relativePath, message.Line)
+                        .WithLogLevel(CompilerMessageTypeToLogLevel(message.Type))
+                        .WithCustomProperties(new object[(int)CodeProperty.Num] { assemblyInfo.Name })
+                        .WithUpgradeProperties(new[] { Application.unityVersion, null, message.Message });
                 }
                 else
                 {

@@ -4,6 +4,7 @@
 * [Project issues](project-issues.md)
   * [Project issues introduction](project-issues-introduction.md)
   * [Domain reloading](domain-reloading-issues.md)
+  * [Identify obsolete API between Unity versions](obsolete-api)
 * [Programming with Project Auditor](project-auditor-programming.md)
   * [Run Project Auditor from the command line](run-from-command-line.md)
   * [Compare issues and insights](compare-issues.md)

@@ -157,5 +157,18 @@ namespace Unity.ProjectAuditor.Editor.Core
             m_Issue.UpgradeProperties = properties;
             return this;
         }
+
+        /// <summary>
+        /// Mark this issue as being an upgrade problem.
+        /// </summary>
+        /// <param name="minVersion">First affected version</param>
+        /// <param name="maxVersion">Last affected version, or null if not applicable</param>
+        /// <param name="recommendation">Recommended action</param>
+        /// <returns>The ReportItemBuilder object with the upgrade data added</returns>
+        public ReportItemBuilder WithUpgradeProperties(string minVersion, string maxVersion, string recommendation)
+        {
+            m_Issue.UpgradeProperties = new[] { minVersion, maxVersion, recommendation };
+            return this;
+        }
     }
 }

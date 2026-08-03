@@ -7,6 +7,7 @@ using UnityEngine.Rendering;
 
 namespace Unity.ProjectAuditor.Editor.SettingsAnalysis
 {
+    [MigratedToRulesPackage(2)]
     class GraphicsApiAnalyzer : SettingsModuleAnalyzer
     {
         const string documentationUrl = "https://docs.unity3d.com/Manual/GraphicsAPIs.html";
@@ -58,15 +59,15 @@ namespace Unity.ProjectAuditor.Editor.SettingsAnalysis
 
         public override IEnumerable<ReportItem> Analyze(SettingsAnalysisContext context)
         {
-            if (k_OpenGLESAndMetalDescriptor.IsApplicable(context.Params) && IsUsingOpenGlesAndMetal())
+            if (k_OpenGLESAndMetalDescriptor.IsSupported(context.Params) && IsUsingOpenGlesAndMetal())
                 yield return context.CreateIssue(IssueCategory.ProjectSetting, k_OpenGLESAndMetalDescriptor.Id)
                     .WithLocation("Project/Player");
 
-            if (k_MetalDescriptor.IsApplicable(context.Params) && IsNotUsingMetal())
+            if (k_MetalDescriptor.IsSupported(context.Params) && IsNotUsingMetal())
                 yield return context.CreateIssue(IssueCategory.ProjectSetting, k_MetalDescriptor.Id)
                     .WithLocation("Project/Player");
 
-            if (k_VulkanDescriptor.IsApplicable(context.Params) && IsNotUsingVulkan())
+            if (k_VulkanDescriptor.IsSupported(context.Params) && IsNotUsingVulkan())
                 yield return context.CreateIssue(IssueCategory.ProjectSetting, k_VulkanDescriptor.Id)
                     .WithLocation("Project/Player");
         }

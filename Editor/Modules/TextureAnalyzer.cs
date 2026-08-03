@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace Unity.ProjectAuditor.Editor.Modules
 {
+    [MigratedToRulesPackage(2)]
     class TextureAnalyzer : TextureModuleAnalyzer
     {
         internal const string PAA0000 = nameof(PAA0000);
@@ -31,6 +32,7 @@ namespace Unity.ProjectAuditor.Editor.Modules
                     textureImporter.mipmapEnabled = true;
                     textureImporter.SaveAndReimport();
                 }
+                return true;
             }
         };
 
@@ -51,6 +53,7 @@ namespace Unity.ProjectAuditor.Editor.Modules
                     textureImporter.mipmapEnabled = false;
                     textureImporter.SaveAndReimport();
                 }
+                return true;
             }
         };
 
@@ -72,6 +75,7 @@ namespace Unity.ProjectAuditor.Editor.Modules
                     textureImporter.isReadable = false;
                     textureImporter.SaveAndReimport();
                 }
+                return true;
             }
         };
 
@@ -92,6 +96,7 @@ namespace Unity.ProjectAuditor.Editor.Modules
                     textureImporter.streamingMipmaps = true;
                     textureImporter.SaveAndReimport();
                 }
+                return true;
             }
         };
 
@@ -113,6 +118,7 @@ namespace Unity.ProjectAuditor.Editor.Modules
                     textureImporter.anisoLevel = 1;
                     textureImporter.SaveAndReimport();
                 }
+                return true;
             }
         };
 
@@ -163,7 +169,7 @@ namespace Unity.ProjectAuditor.Editor.Modules
                     .WithLocation(context.Importer.assetPath);
             }
 
-            if (k_TextureAnisotropicLevelDescriptor.IsApplicable(context.Params) &&
+            if (k_TextureAnisotropicLevelDescriptor.IsSupported(context.Params) &&
                 context.Importer.mipmapEnabled && context.Importer.filterMode != FilterMode.Point && context.Importer.anisoLevel > 1)
             {
                 yield return context.CreateIssue(IssueCategory.AssetIssue, k_TextureAnisotropicLevelDescriptor.Id, context.Name, context.Importer.anisoLevel)

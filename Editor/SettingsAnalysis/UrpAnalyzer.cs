@@ -82,7 +82,7 @@ namespace Unity.ProjectAuditor.Editor.SettingsAnalysis
             foreach (var analyzeSrpAsset in RenderPipelineUtils.AnalyzeAssets(context, Analyze))
                 yield return analyzeSrpAsset;
 
-            if (!k_CameraStopNanDescriptor.IsApplicable(context.Params))
+            if (!k_CameraStopNanDescriptor.IsSupported(context.Params))
                 yield break;
 
             var allCameraData = RenderPipelineUtils
@@ -98,30 +98,32 @@ namespace Unity.ProjectAuditor.Editor.SettingsAnalysis
 #endif
         }
 
-        private static void FixHdrSetting(ReportItem issue, AnalysisParams analysisParams)
+        private static bool FixHdrSetting(ReportItem issue, AnalysisParams analysisParams)
         {
 #if PACKAGE_URP
             RenderPipelineUtils.FixAssetSetting(issue, p => SetHdrSetting(p, false));
 #endif
+            return true;
         }
 
-        static void FixMsaaSampleCountSetting(ReportItem issue, AnalysisParams analysisParams)
+        static bool FixMsaaSampleCountSetting(ReportItem issue, AnalysisParams analysisParams)
         {
 #if PACKAGE_URP
             RenderPipelineUtils.FixAssetSetting(issue, p => SetMsaaSampleCountSetting(p, 2));
 #endif
+            return true;
         }
 
         IEnumerable<ReportItem> Analyze(SettingsAnalysisContext context, RenderPipelineAsset renderPipeline, int qualityLevel)
         {
 #if PACKAGE_URP
-            if (k_HdrSettingDescriptor.IsApplicable(context.Params) && GetHdrSetting(renderPipeline))
+            if (k_HdrSettingDescriptor.IsSupported(context.Params) && GetHdrSetting(renderPipeline))
             {
                 yield return RenderPipelineUtils.CreateAssetSettingIssue(context, qualityLevel, renderPipeline.name,
                     k_HdrSettingDescriptor.Id);
             }
 
-            if (k_MsaaSampleCountSettingDescriptor.IsApplicable(context.Params) && GetMsaaSampleCountSetting(renderPipeline) >= 4)
+            if (k_MsaaSampleCountSettingDescriptor.IsSupported(context.Params) && GetMsaaSampleCountSetting(renderPipeline) >= 4)
             {
                 yield return RenderPipelineUtils.CreateAssetSettingIssue(context, qualityLevel, renderPipeline.name,
                     k_MsaaSampleCountSettingDescriptor.Id);

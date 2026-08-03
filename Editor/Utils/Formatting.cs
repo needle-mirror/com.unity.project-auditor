@@ -5,14 +5,14 @@ using UnityEditor;
 
 namespace Unity.ProjectAuditor.Editor.Utils
 {
-    internal static class Formatting
+    public static class Formatting
     {
         /// <summary>
         /// Formats a given DateTime object as a string in the format "yyyy/MM/dd HH:mm".
         /// </summary>
         /// <param name="dateTime">The DateTime object to format.</param>
         /// <returns>A string representation of the input DateTime object in the specified format.</returns>
-        public static string FormatDateTime(DateTime dateTime)
+        internal static string FormatDateTime(DateTime dateTime)
         {
             return dateTime.ToString("yyyy/MM/dd HH:mm");
         }
@@ -22,7 +22,7 @@ namespace Unity.ProjectAuditor.Editor.Utils
         /// </summary>
         /// <param name="timeSpan">The TimeSpan object to format.</param>
         /// <returns>A string representation of the input value.</returns>
-        public static string FormatDuration(TimeSpan timeSpan)
+        internal static string FormatDuration(TimeSpan timeSpan)
         {
             return $"{timeSpan.Hours:00}:{timeSpan.Minutes:00}:{timeSpan.Seconds:00}";
         }
@@ -32,7 +32,7 @@ namespace Unity.ProjectAuditor.Editor.Utils
         /// </summary>
         /// <param name="timeSpan">The TimeSpan object to format.</param>
         /// <returns>A string representation of the input value.</returns>
-        public static string FormatDurationWithMs(TimeSpan timeSpan)
+        internal static string FormatDurationWithMs(TimeSpan timeSpan)
         {
             return $"{timeSpan.Minutes:00}:{timeSpan.Seconds:00}.{timeSpan.Milliseconds:000}";
         }
@@ -42,7 +42,7 @@ namespace Unity.ProjectAuditor.Editor.Utils
         /// </summary>
         /// <param name="timeSpan">The TimeSpan object to format.</param>
         /// <returns>A string representation of the input TimeSpan object.</returns>
-        public static string FormatTime(TimeSpan timeSpan)
+        internal static string FormatTime(TimeSpan timeSpan)
         {
             var timeMs = timeSpan.TotalMilliseconds;
             if (timeMs < 1000)
@@ -57,7 +57,7 @@ namespace Unity.ProjectAuditor.Editor.Utils
         /// </summary>
         /// <param name="timeMs">The time value to format, in milliseconds.</param>
         /// <returns>A string representation of the input float value.</returns>
-        public static string FormatTime(float timeMs)
+        internal static string FormatTime(float timeMs)
         {
             if (float.IsNaN(timeMs))
                 return "NaN";
@@ -91,7 +91,7 @@ namespace Unity.ProjectAuditor.Editor.Utils
         /// </summary>
         /// <param name="size">Frequency value to format.</param>
         /// <returns>A string representation of the input value as a frequency in Hz or kHz.</returns>
-        public static string FormatHz(int frequency)
+        internal static string FormatHz(int frequency)
         {
             return (frequency < 1000) ? $"{frequency} Hz" : $"{((float)frequency / 1000.0f):G0} kHz";
         }
@@ -101,7 +101,7 @@ namespace Unity.ProjectAuditor.Editor.Utils
         /// </summary>
         /// <param name="length">Length value to format.</param>
         /// <returns>A string representation of the input value as a duration in seconds.</returns>
-        public static string FormatLengthInSeconds(float length)
+        internal static string FormatLengthInSeconds(float length)
         {
             return length.ToString("F3") + " s";
         }
@@ -111,29 +111,29 @@ namespace Unity.ProjectAuditor.Editor.Utils
         /// </summary>
         /// <param name="framerate">Framerate value to format.</param>
         /// <returns>A string representation of the input value as a framerate.</returns>
-        public static string FormatFramerate(float framerate)
+        internal static string FormatFramerate(float framerate)
         {
             return framerate + " fps";
         }
 
         static readonly string k_StringSeparator = ", ";
 
-        public static string CombineStrings(string[] strings, string separator = null)
+        internal static string CombineStrings(string[] strings, string separator = null)
         {
             return string.Join(separator ?? k_StringSeparator, strings);
         }
 
-        public static string[] SplitStrings(string combinedString, string separator = null)
+        internal static string[] SplitStrings(string combinedString, string separator = null)
         {
             return combinedString.Split(new[] {separator ?? k_StringSeparator}, StringSplitOptions.None);
         }
 
-        public static string ReplaceStringSeparators(string combinedString, string separator)
+        internal static string ReplaceStringSeparators(string combinedString, string separator)
         {
             return combinedString.Replace(k_StringSeparator, separator);
         }
 
-        public static string StripRichTextTags(string text)
+        internal static string StripRichTextTags(string text)
         {
             text = RemoveRichTextTag(text, "b", string.Empty);
             text = RemoveRichTextTag(text, "i", string.Empty);
@@ -152,7 +152,7 @@ namespace Unity.ProjectAuditor.Editor.Utils
         }
 
         // Strings to match the new Build Profiles page. We can't access them directly right now, so duplicate.
-        public static string GetModernBuildTargetName(BuildTarget buildTarget)
+        internal static string GetModernBuildTargetName(BuildTarget buildTarget)
         {
             switch (buildTarget)
             {
@@ -187,7 +187,7 @@ namespace Unity.ProjectAuditor.Editor.Utils
             }
         }
 
-        public static string GetModernBuildTargetName(BuildTargetGroup buildTargetGroup)
+        internal static string GetModernBuildTargetName(BuildTargetGroup buildTargetGroup)
         {
             switch (buildTargetGroup)
             {

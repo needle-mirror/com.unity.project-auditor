@@ -7,24 +7,27 @@ using UnityEngine;
 
 namespace Unity.ProjectAuditor.Editor.Core
 {
-    internal static class DescriptorExtensions
+    /// <summary>
+    /// Additional Descriptor functionality
+    /// </summary>
+    public static class DescriptorExtensions
     {
-        public static string GetAreasSummary(this Descriptor descriptor)
+        internal static string GetAreasSummary(this Descriptor descriptor)
         {
-            return DescriptorLibrary.GetAreasString(descriptor.Areas);
+            return descriptor.Areas.ToFrontendString();
         }
 
-        public static bool MatchesAnyAreas(this Descriptor descriptor, Areas areasToMatch)
+        internal static bool MatchesAnyAreas(this Descriptor descriptor, Areas areasToMatch)
         {
             return (descriptor.Areas & areasToMatch) != 0;
         }
 
-        public static string GetPlatformsSummary(this Descriptor descriptor)
+        internal static string GetPlatformsSummary(this Descriptor descriptor)
         {
             return (descriptor.Platforms == null || descriptor.Platforms.Length == 0) ? "Any" : Formatting.CombineStrings(descriptor.Platforms.Select(p => p.ToString()).ToArray());
         }
 
-        public static string GetFullTypeName(this Descriptor descriptor)
+        internal static string GetFullTypeName(this Descriptor descriptor)
         {
             return descriptor.Type + "." + descriptor.Method;
         }
@@ -32,27 +35,38 @@ namespace Unity.ProjectAuditor.Editor.Core
         /// <summary>
         /// Check if the descriptor applies to the given platform
         /// </summary>
-        public static bool IsPlatformCompatible(this Descriptor descriptor, BuildTarget buildTarget)
+        static bool IsPlatformCompatible(this Descriptor descriptor, BuildTarget buildTarget)
         {
             if (descriptor.Platforms == null || descriptor.Platforms.Length == 0)
                 return true;
             return descriptor.Platforms.Contains(buildTarget);
         }
 
-        public static bool IsApplicable(this Descriptor desc, AnalysisParams analysisParams)
+        /// <summary>
+        /// Check if the descriptor is valid for the target platform specified in AnalysisParams and the current Editor version
+        /// </summary>
+        /// <param name="desc">The descriptor to check.</param>
+        /// <param name="analysisParams">The analysis parameters containing the target platform.</param>
+        /// <returns>True if the descriptor is supported; otherwise, false.</returns>
+        public static bool IsSupported(this Descriptor desc, AnalysisParams analysisParams)
         {
             return desc.IsVersionCompatible() && desc.IsPlatformCompatible(analysisParams.Platform);
         }
 
+        /// <summary>
+        /// Check if the descriptor is valid for any platform supported by the current Editor and the current Editor version
+        /// </summary>
+        /// <param name="desc">The descriptor to check.</param>
+        /// <returns>True if the descriptor is supported; otherwise, false.</returns>
         public static bool IsSupported(this Descriptor desc)
         {
             return desc.IsPlatformSupported() && desc.IsVersionCompatible();
         }
 
         /// <summary>
-        /// Check if any descriptor's platforms are supported by the current editor
+        /// Check if any of the descriptor's platforms are supported by the current editor
         /// </summary>
-        public static bool IsPlatformSupported(this Descriptor desc)
+        static bool IsPlatformSupported(this Descriptor desc)
         {
             var platforms = desc.Platforms;
             if (platforms == null)
@@ -73,22 +87,12 @@ namespace Unity.ProjectAuditor.Editor.Core
             return false;
         }
 
-        /// <summary>
-        /// Check if the descriptor applies only to the given platform
-        /// </summary>
-        public static bool IsPlatformSpecific(this Descriptor descriptor, BuildTarget buildTarget)
-        {
-            if (descriptor.Platforms == null || descriptor.Platforms.Length != 1)
-                return false;
-            return descriptor.Platforms[0].Equals(buildTarget.ToString());
-        }
-
         static Version s_UnityVersion = (Version)null;
 
         /// <summary>
         /// Check if the descriptor's version is compatible with the current editor
         /// </summary>
-        public static bool IsVersionCompatible(this Descriptor desc)
+        static bool IsVersionCompatible(this Descriptor desc)
         {
             if (s_UnityVersion == null)
             {

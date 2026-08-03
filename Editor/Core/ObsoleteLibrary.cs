@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Unity.ProjectAuditor.Editor.Core
 {
-    class ObsoleteLibrary
+    static class ObsoleteLibrary
     {
 #pragma warning disable CS0649
 
@@ -32,7 +32,7 @@ namespace Unity.ProjectAuditor.Editor.Core
         static List<ReportItem> s_LibraryList;
         static string[] s_UnityVersions;
 
-        public static Dictionary<string, ReportItem> LibraryDictionary
+        internal static IReadOnlyDictionary<string, ReportItem> LibraryDictionary
         {
             get
             {
@@ -42,7 +42,7 @@ namespace Unity.ProjectAuditor.Editor.Core
             }
         }
 
-        public static List<ReportItem> LibraryList
+        internal static IReadOnlyList<ReportItem> LibraryList
         {
             get
             {
@@ -54,9 +54,9 @@ namespace Unity.ProjectAuditor.Editor.Core
 
         // If the running Unity version is so new that we don't have any information about
         // future versions in our database, then this check will return false
-        public static bool HasAnyUpgradeVersions => UnityVersions.Length > 0;
+        internal static bool HasAnyUpgradeVersions => UnityVersions.Length > 0;
 
-        public static string[] UnityVersions
+        internal static string[] UnityVersions
         {
             get
             {
@@ -70,7 +70,12 @@ namespace Unity.ProjectAuditor.Editor.Core
         {
             try
             {
-                var json = File.ReadAllText(Path.Combine(ProjectAuditor.s_RulesDataPath, "ObsoleteDatabase.json"));
+                var path = Path.Combine(ProjectAuditor.s_RulesDataPath, "ObsoleteDatabase.gen.json");
+
+                // TEMP: support both paths while we migrate to new name
+                string filename = File.Exists(path) ? path : Path.Combine(ProjectAuditor.s_RulesDataPath, "ObsoleteDatabase.json");
+
+                var json = File.ReadAllText(filename);
                 var obsoleteApi = JsonUtility.FromJson<SerializedApiCollection>(json).items;
                 var uniqueVersions = new HashSet<string>();
 
@@ -111,7 +116,7 @@ namespace Unity.ProjectAuditor.Editor.Core
                 foreach (var version in uniqueVersions)
                 {
                     var versionInt = Utility.VersionToInt(version);
-                    if (versionInt > currentVersion)
+                    if (versionInt >= currentVersion)
                         unityVersions.Add(version);
                 }
 

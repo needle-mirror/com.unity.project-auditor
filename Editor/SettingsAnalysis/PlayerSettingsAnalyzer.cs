@@ -8,6 +8,7 @@ using UnityEngine;
 
 namespace Unity.ProjectAuditor.Editor.SettingsAnalysis
 {
+    [MigratedToRulesPackage(2)]
     class PlayerSettingsAnalyzer : SettingsModuleAnalyzer
     {
         internal const string PAS0002 = nameof(PAS0002);
@@ -45,6 +46,7 @@ namespace Unity.ProjectAuditor.Editor.SettingsAnalysis
             Fixer = (issue, analysisParams) =>
             {
                 FixSpeakerMode();
+                return true;
             }
         };
 
@@ -59,6 +61,7 @@ namespace Unity.ProjectAuditor.Editor.SettingsAnalysis
             {
                 var buildTargetGroup = BuildPipeline.GetBuildTargetGroup(analysisParams.Platform);
                 SetIL2CPPConfigurationToRelease(buildTargetGroup);
+                return true;
             },
 
             MessageFormat = "Player: C++ Compiler Configuration is set to 'Master'"
@@ -75,6 +78,7 @@ namespace Unity.ProjectAuditor.Editor.SettingsAnalysis
             {
                 var buildTargetGroup = BuildPipeline.GetBuildTargetGroup(analysisParams.Platform);
                 SetIL2CPPConfigurationToRelease(buildTargetGroup);
+                return true;
             },
 
             MessageFormat = "Player: C++ Compiler Configuration is set to 'Debug'"
@@ -91,6 +95,7 @@ namespace Unity.ProjectAuditor.Editor.SettingsAnalysis
             {
                 var buildTargetGroup = BuildPipeline.GetBuildTargetGroup(analysisParams.Platform);
                 PlayerSettingsUtil.SetLightmapStreaming(buildTargetGroup, true);
+                return true;
             },
         };
 
@@ -106,7 +111,7 @@ namespace Unity.ProjectAuditor.Editor.SettingsAnalysis
 
         public override IEnumerable<ReportItem> Analyze(SettingsAnalysisContext context)
         {
-            if (k_AccelerometerDescriptor.IsApplicable(context.Params) && IsAccelerometerEnabled())
+            if (k_AccelerometerDescriptor.IsSupported(context.Params) && IsAccelerometerEnabled())
             {
                 yield return context.CreateIssue(IssueCategory.ProjectSetting, k_AccelerometerDescriptor.Id)
                     .WithLocation("Project/Player");
@@ -116,7 +121,7 @@ namespace Unity.ProjectAuditor.Editor.SettingsAnalysis
                 yield return context.CreateIssue(IssueCategory.ProjectSetting, k_SplashScreenDescriptor.Id)
                     .WithLocation("Project/Player");
             }
-            if (k_SpeakerModeDescriptor.IsApplicable(context.Params) && !IsSpeakerModeMono())
+            if (k_SpeakerModeDescriptor.IsSupported(context.Params) && !IsSpeakerModeMono())
             {
                 yield return context.CreateIssue(IssueCategory.ProjectSetting, k_SpeakerModeDescriptor.Id)
                     .WithLocation("Project/Player");

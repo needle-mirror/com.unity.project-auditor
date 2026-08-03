@@ -52,8 +52,13 @@ To open the Preferences window, go to Edit > Preferences (macOS: Unity > Setting
                 }
             }
 
+            DrawUpgradeFilter();
+
             if (EditorGUI.EndChangeCheck())
+            {
                 MarkDirty();
+                ClearSelection();
+            }
         }
     }
 }

@@ -19,6 +19,7 @@ namespace Unity.ProjectAuditor.Editor.SettingsAnalysis
         ExponentialSquared
     }
 
+    [MigratedToRulesPackage(2)]
     class FogStrippingAnalyzer : SettingsModuleAnalyzer
     {
         internal const string PAS1003 = nameof(PAS1003);
@@ -33,6 +34,7 @@ namespace Unity.ProjectAuditor.Editor.SettingsAnalysis
             Fixer = (issue, analysisParams) =>
             {
                 RemoveFogStripping();
+                return true;
             },
 
             MessageFormat = "Graphics: Fog Mode '{0}' shader variants are always included in the build"

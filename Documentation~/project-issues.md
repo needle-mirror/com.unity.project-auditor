@@ -9,6 +9,7 @@ Project Auditor displays issues with your project, and this section is intended 
 |---|---|
 |[Project issues introduction](project-issues-introduction.md)|Overview of common project issues and resources to optimize your project.|
 |[Domain reloading](domain-reloading-issues.md)|Understand how domain reloading can affect your project.|
+|[Identify obsolete API between Unity versions](obsolete-api)|Identify and fix API issues when you move a project to a more recent Unity version.|
 
 ## Additional resources
 

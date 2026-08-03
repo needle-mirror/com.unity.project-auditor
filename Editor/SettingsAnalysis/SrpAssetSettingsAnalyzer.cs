@@ -12,6 +12,7 @@ using UnityEngine.Rendering.HighDefinition;
 
 namespace Unity.ProjectAuditor.Editor.SettingsAnalysis
 {
+    [MigratedToRulesPackage(2)]
     class SrpAssetSettingsAnalyzer : SettingsModuleAnalyzer
     {
         internal const string PAS1008 = nameof(PAS1008);
@@ -37,9 +38,10 @@ namespace Unity.ProjectAuditor.Editor.SettingsAnalysis
             return RenderPipelineUtils.AnalyzeAssets(context, Analyze);
         }
 
-        static void FixSrpBatcherSetting(ReportItem issue, AnalysisParams analysisParams)
+        static bool FixSrpBatcherSetting(ReportItem issue, AnalysisParams analysisParams)
         {
             RenderPipelineUtils.FixAssetSetting(issue, p => SetSrpBatcherSetting(p, true));
+            return true;
         }
 
         IEnumerable<ReportItem> Analyze(SettingsAnalysisContext context, RenderPipelineAsset renderPipeline, int qualityLevel)

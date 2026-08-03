@@ -18,7 +18,7 @@ namespace Unity.ProjectAuditor.Editor.UI.Framework
         Vector2 m_DetailsScrollPos;
         Vector2 m_RecommendationScrollPos;
 
-        bool m_ShowUpgradeRecommendations;
+        bool m_ShowUpgradeRecommendations = true;
 
         public DiagnosticView(ViewManager viewManager) : base(viewManager)
         {
@@ -119,7 +119,7 @@ namespace Unity.ProjectAuditor.Editor.UI.Framework
                     GUILayout.MaxHeight(LayoutSize.FoldoutMaxHeight));
             else
             {
-                GUILayout.TextArea(descriptor.Recommendation, SharedStyles.TextAreaWithDynamicSize,
+                GUILayout.TextArea(recommendationText, SharedStyles.TextAreaWithDynamicSize,
                     GUILayout.MaxHeight(LayoutSize.FoldoutMaxHeight));
             }
 
@@ -227,6 +227,17 @@ namespace Unity.ProjectAuditor.Editor.UI.Framework
                 }
             }
 
+            DrawUpgradeFilter();
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                MarkDirty();
+                ClearSelection();
+            }
+        }
+
+        protected void DrawUpgradeFilter()
+        {
             if (ObsoleteLibrary.HasAnyUpgradeVersions)
             {
                 using (new EditorGUILayout.HorizontalScope())
@@ -250,12 +261,6 @@ namespace Unity.ProjectAuditor.Editor.UI.Framework
                         m_ViewStates.upgradeTargetVersion = ObsoleteLibrary.UnityVersions[selectedIndex];
                     }
                 }
-            }
-
-            if (EditorGUI.EndChangeCheck())
-            {
-                MarkDirty();
-                ClearSelection();
             }
         }
 
@@ -327,7 +332,7 @@ namespace Unity.ProjectAuditor.Editor.UI.Framework
                     var upgradeProblemSince = issue.UpgradeProperties[(int)UpgradeProperties.MinVersion];
                     var upgradeProblemUntil = issue.UpgradeProperties[(int)UpgradeProperties.MaxVersion];
 
-                    var upgradeProblemSinceInt = Utils.Utility.VersionToInt(upgradeProblemSince);
+                    var upgradeProblemSinceInt = string.IsNullOrEmpty(upgradeProblemSince) ? int.MinValue : Utils.Utility.VersionToInt(upgradeProblemSince);
                     var upgradeProblemUntilInt = string.IsNullOrEmpty(upgradeProblemUntil) ? int.MaxValue : Utils.Utility.VersionToInt(upgradeProblemUntil);
 
                     if (upgradeProblemSinceInt > realTargetVersionInt || upgradeProblemUntilInt <= realTargetVersionInt)

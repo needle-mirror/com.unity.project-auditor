@@ -4,6 +4,27 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [3.0.0] - 2026-08-03
+
+### Added
+* Add a new internal attribute to ignore analyzers (as we migrate them to the rules package)
+* Add an AnimationClip analyzer, to support detecting new types of issues
+* Add a Precompiled Assembly analyzer, to support detecting new types of issues
+* New public Descriptor.IsSupported methods, to help with writing analyzers outside the package
+* Advise users to use the AutoStaticsCleanup attributes if upgrading to Unity 6.5 and newer
+* Use analyzers from the Rules package instead of the copies inside this package
+* Add new areas to help with migration to CoreCLR and URP
+
+### Changed
+* Minimum supported Unity version is now 6000.0
+
+### Fixed
+* Fix upgrade recommendation text
+* Remove IsUpgradeIssue from report file
+* Use new name for loading ObsoleteDatabase.json (ObsoleteDatabase.gen.json)
+* Fix Assembly/Area selection window disappearing when docked as a tab and another tab is selected or closed (UUM-142406)
+* Ensure all AnimationClip assets are detected and analyzed
+
 ## [2.0.0] - 2026-04-15
 
 ### Added

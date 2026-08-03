@@ -7,6 +7,7 @@ using UnityEngine.U2D;
 
 namespace Unity.ProjectAuditor.Editor.Modules
 {
+    [MigratedToRulesPackage(2)]
     internal class SpriteAtlasAnalyzer : SpriteAtlasModuleAnalyzer
     {
         internal const string PAA0008 = nameof(PAA0008);

@@ -36,7 +36,7 @@ namespace Unity.ProjectAuditor.Editor.UI
             Valid
         }
 
-        static readonly string[] AreaNames = Enum.GetNames(typeof(Areas)).Where(a => a != "None" && a != "All").ToArray();
+        static readonly string[] AreaNames = Array.ConvertAll(AreasExtensions.AlphabeticalAreas, (a) => a.ToString());
         static ProjectAuditorWindow s_Instance;
 
         public static ProjectAuditorWindow Instance
@@ -189,10 +189,13 @@ namespace Unity.ProjectAuditor.Editor.UI
             if (issue.Location == null)
                 return false;
 
-            if ((issue.Location.Path.IndexOf("packages/", StringComparison.OrdinalIgnoreCase) >= 0)
-                || (issue.Location.Path.IndexOf("Unity.SourceGenerators/", StringComparison.OrdinalIgnoreCase) >= 0))
+            if (issue.Category != IssueCategory.Package && issue.Category != IssueCategory.ProjectSetting) // Mostly just want to skip code issues if AnalyzePackagesForIssues==false, not package insights, version checks, upgrade advice, etc
             {
-                return false;
+                if ((issue.Location.Path.IndexOf("packages/", StringComparison.OrdinalIgnoreCase) >= 0)
+                    || (issue.Location.Path.IndexOf("Unity.SourceGenerators/", StringComparison.OrdinalIgnoreCase) >= 0))
+                {
+                    return false;
+                }
             }
 
             var isDiagnostic = issue.IsIssue();

@@ -8,6 +8,7 @@ using UnityEngine;
 
 namespace Unity.ProjectAuditor.Editor.SettingsAnalysis
 {
+    [MigratedToRulesPackage(2)]
     class BuiltinSettingsAnalyzer : SettingsModuleAnalyzer
     {
         readonly List<Assembly> m_Assemblies = new List<Assembly>();
@@ -49,7 +50,7 @@ namespace Unity.ProjectAuditor.Editor.SettingsAnalysis
             if (m_Descriptors == null)
                 throw new Exception("Descriptors Database not initialized.");
 
-            foreach (var descriptor in m_Descriptors.Where(d => d.IsApplicable(context.Params)))
+            foreach (var descriptor in m_Descriptors.Where(d => d.IsSupported(context.Params)))
             {
                 var issue = Evaluate(context, descriptor);
                 if (issue != null)

@@ -50,7 +50,7 @@ namespace Unity.ProjectAuditor.Editor.Core
     /// <summary>
     /// Abstract base class for an Analyzer to be invoked by CodeModule
     /// </summary>
-    public abstract class CodeModuleInstructionAnalyzer : ModuleAnalyzer
+    public abstract class CodeModuleInstructionAnalyzer : CodeModuleAnalyzer
     {
         /// <summary>
         /// A collection of Mono.Cecil OpCodes which are used by this analyzer.

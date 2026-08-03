@@ -9,6 +9,7 @@ using UnityEngine.Rendering;
 
 namespace Unity.ProjectAuditor.Editor.SettingsAnalysis
 {
+    [MigratedToRulesPackage(2)]
     class HdrpAnalyzer : SettingsModuleAnalyzer
     {
         internal const string PAS1001 = nameof(PAS1001);

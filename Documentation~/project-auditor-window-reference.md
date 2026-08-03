@@ -39,7 +39,7 @@ Most Project Area views allow you to filter the data to areas that you want to f
 | **Assembly** (only available in some code-related Project Area views)| Display code issues according to what assembly they were found in. The **Select** button opens an Assembly window where you can enable the assemblies you're interested in.|
 |**Areas** (only available in some Project Area views) |Filter results by specific areas. The **Select** button opens an Areas window where you can enable the areas you're interested in.|
 | **Search** | Filter the table with a string search. Type a search string into the text box and press return to display items that contain the search string.|
-|**Show** (only available in some Project Area views)| Filter the results by issue type. Some views allow you to filter issues by severity. Enable or disable the checkboxes to include these issues.|
+| **Show** (only available in some Project Area views)| Filter the results by issue type. Select or deselect each checkbox to include or hide each issue type. Select **Upgrade Recommendations** to choose a Unity version and display APIs that are obsolete in that version. Some views allow you to filter issues by severity. |
 
 ![](images/assemblies.png)<br/>_Assemblies window_
 

@@ -7,7 +7,7 @@ namespace Unity.ProjectAuditor.Editor.Core
     /// <summary>
     /// A context object passed by a MaterialModule to a MaterialModuleAnalyzer's Analyze() method.
     /// </summary>
-    public class MaterialAnalysisContext : AnalysisContext
+    public class MaterialAnalysisContext : AssetAnalysisContext
     {
         /// <summary>
         /// The name of a material asset in the project

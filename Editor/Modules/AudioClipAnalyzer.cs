@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace Unity.ProjectAuditor.Editor.Modules
 {
+    [MigratedToRulesPackage(2)]
     class AudioClipAnalyzer : AudioClipModuleAnalyzer
     {
         internal const string PAA4000 = nameof(PAA4000);    // Long AudioClips which aren’t set to streaming
@@ -40,6 +41,7 @@ namespace Unity.ProjectAuditor.Editor.Modules
                     audioImporter.SetOverrideSampleSettings(analysisParams.PlatformAsString, sampleSettings);
                     audioImporter.SaveAndReimport();
                 }
+                return true;
             }
         };
 
@@ -71,6 +73,7 @@ namespace Unity.ProjectAuditor.Editor.Modules
                     audioImporter.forceToMono = true;
                     audioImporter.SaveAndReimport();
                 }
+                return true;
             },
             Platforms = new[] { BuildTarget.Android, BuildTarget.iOS}
         };
@@ -92,6 +95,7 @@ namespace Unity.ProjectAuditor.Editor.Modules
                     audioImporter.forceToMono = true;
                     audioImporter.SaveAndReimport();
                 }
+                return true;
             }
         };
 
@@ -150,6 +154,7 @@ namespace Unity.ProjectAuditor.Editor.Modules
                     audioImporter.SetOverrideSampleSettings(analysisParams.PlatformAsString, sampleSettings);
                     audioImporter.SaveAndReimport();
                 }
+                return true;
             }
         };
 
@@ -176,6 +181,7 @@ namespace Unity.ProjectAuditor.Editor.Modules
 #endif
                     audioImporter.SaveAndReimport();
                 }
+                return true;
             }
         };
 
@@ -196,6 +202,7 @@ namespace Unity.ProjectAuditor.Editor.Modules
                     audioImporter.loadInBackground = true;
                     audioImporter.SaveAndReimport();
                 }
+                return true;
             }
         };
 
@@ -218,6 +225,7 @@ namespace Unity.ProjectAuditor.Editor.Modules
                     audioImporter.SetOverrideSampleSettings(analysisParams.PlatformAsString, sampleSettings);
                     audioImporter.SaveAndReimport();
                 }
+                return true;
             }
         };
 

@@ -6,6 +6,7 @@ using UnityEditor;
 
 namespace Unity.ProjectAuditor.Editor.SettingsAnalysis
 {
+    [MigratedToRulesPackage(2)]
     class StrippingAnalyzer : SettingsModuleAnalyzer
     {
         internal const string PAS0009 = nameof(PAS0009);
@@ -55,13 +56,13 @@ namespace Unity.ProjectAuditor.Editor.SettingsAnalysis
 
         public override IEnumerable<ReportItem> Analyze(SettingsAnalysisContext context)
         {
-            if (k_EngineCodeStrippingDescriptor.IsApplicable(context.Params) && !PlayerSettings.stripEngineCode)
+            if (k_EngineCodeStrippingDescriptor.IsSupported(context.Params) && !PlayerSettings.stripEngineCode)
             {
                 yield return context.CreateIssue(IssueCategory.ProjectSetting, k_EngineCodeStrippingDescriptor.Id)
                     .WithLocation("Project/Player");
             }
 
-            if (k_AndroidManagedStrippingDescriptor.IsApplicable(context.Params))
+            if (k_AndroidManagedStrippingDescriptor.IsSupported(context.Params))
             {
                 var value = PlayerSettingsUtil.GetManagedStrippingLevel(BuildTargetGroup.Android);
                 if (value == ManagedStrippingLevel.Disabled || value == ManagedStrippingLevel.Low
@@ -73,7 +74,7 @@ namespace Unity.ProjectAuditor.Editor.SettingsAnalysis
                         .WithLocation("Project/Player");
             }
 
-            if (k_iOSManagedStrippingDescriptor.IsApplicable(context.Params))
+            if (k_iOSManagedStrippingDescriptor.IsSupported(context.Params))
             {
                 var value = PlayerSettingsUtil.GetManagedStrippingLevel(BuildTargetGroup.iOS);
                 if (value == ManagedStrippingLevel.Disabled || value == ManagedStrippingLevel.Low)

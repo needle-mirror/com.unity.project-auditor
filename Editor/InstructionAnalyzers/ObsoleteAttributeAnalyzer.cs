@@ -159,7 +159,8 @@ namespace Unity.ProjectAuditor.Editor.InstructionAnalyzers
 
                         yield return context.CreateIssue(IssueCategory.Code, k_ObsoleteAttributeIssueDescriptor.Id)
                             .WithSeverity(error ? Severity.Error : Severity.Warning)
-                            .WithDescription(msg);
+                            .WithDescription(msg)
+                            .WithUpgradeProperties(new[] { Application.unityVersion, null, msg }); ;
                     }
                 }
 

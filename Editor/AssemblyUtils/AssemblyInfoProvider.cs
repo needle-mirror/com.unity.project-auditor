@@ -39,19 +39,25 @@ namespace Unity.ProjectAuditor.Editor.AssemblyUtils
     {
         const string k_VirtualPackagesRoot = "Packages";
 
-        internal static IEnumerable<string> GetPrecompiledAssemblyPaths(PrecompiledAssemblyTypes flags)
+        internal static List<string> GetPrecompiledAssemblyPaths(PrecompiledAssemblyTypes flags)
         {
-            var assemblyPaths = new List<string>();
             var precompiledAssemblySources = (CompilationPipeline.PrecompiledAssemblySources)flags;
-            assemblyPaths.AddRange(CompilationPipeline.GetPrecompiledAssemblyPaths(precompiledAssemblySources));
+            var assemblyPaths = CompilationPipeline.GetPrecompiledAssemblyPaths(precompiledAssemblySources);
 
-            return assemblyPaths.Select(PathUtils.ReplaceSeparators);
+            var result = new List<string>(assemblyPaths.Length);
+            foreach (var path in assemblyPaths)
+                result.Add(PathUtils.ReplaceSeparators(path));
+            return result;
         }
 
-        internal static IEnumerable<string> GetPrecompiledAssemblyDirectories(PrecompiledAssemblyTypes flags)
+        internal static HashSet<string> GetPrecompiledAssemblyDirectories(PrecompiledAssemblyTypes flags)
         {
-            foreach (var dir in GetPrecompiledAssemblyPaths(flags).Select(Path.GetDirectoryName).Distinct())
-                yield return dir;
+            var assemblyPaths = GetPrecompiledAssemblyPaths(flags);
+
+            var result = new HashSet<string>(assemblyPaths.Count);
+            foreach (var path in assemblyPaths)
+                result.Add(PathUtils.GetDirectoryName(path));
+            return result;
         }
 
         internal static bool IsUserAssembly(string assemblyName)

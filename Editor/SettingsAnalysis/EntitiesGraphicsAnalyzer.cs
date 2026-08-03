@@ -5,6 +5,7 @@ using Unity.ProjectAuditor.Editor.Utils;
 
 namespace Unity.ProjectAuditor.Editor.SettingsAnalysis
 {
+    [MigratedToRulesPackage(2)]
     class EntitiesGraphicsAnalyzer : SettingsModuleAnalyzer
     {
         internal const string PAS1000 = nameof(PAS1000);
@@ -21,6 +22,7 @@ namespace Unity.ProjectAuditor.Editor.SettingsAnalysis
             Fixer = (issue, analysisParams) =>
             {
                 PlayerSettingsUtil.SetStaticBatchingEnabled(analysisParams.Platform, false);
+                return true;
             }
         };
 
@@ -34,6 +36,7 @@ namespace Unity.ProjectAuditor.Editor.SettingsAnalysis
             Fixer = (issue, analysisParams) =>
             {
                 PlayerSettingsUtil.SetStaticBatchingEnabled(analysisParams.Platform, false);
+                return true;
             }
         };
 
