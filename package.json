@@ -1,6 +1,6 @@
 {
   "name": "com.unity.project-auditor",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "displayName": "Project Auditor",
   "unity": "6000.0",
   "description": "Project Auditor is a static analysis tool that analyzes assets, settings, and scripts of the Unity project and produces a report containing: Code and Settings Diagnostics, the last BuildReport, and assets information.",
@@ -14,18 +14,18 @@
     "com.unity.project-auditor-rules": "1.0.3"
   },
   "relatedPackages": {
-    "com.unity.project-auditor.tests": "3.0.0"
+    "com.unity.project-auditor.tests": "3.0.1"
   },
   "_upm": {
-    "changelog": "### Added\n* Add a new internal attribute to ignore analyzers (as we migrate them to the rules package)\n* Add an AnimationClip analyzer, to support detecting new types of issues\n* Add a Precompiled Assembly analyzer, to support detecting new types of issues\n* New public Descriptor.IsSupported methods, to help with writing analyzers outside the package\n* Advise users to use the AutoStaticsCleanup attributes if upgrading to Unity 6.5 and newer\n* Use analyzers from the Rules package instead of the copies inside this package\n* Add new areas to help with migration to CoreCLR and URP\n\n### Changed\n* Minimum supported Unity version is now 6000.0\n\n### Fixed\n* Fix upgrade recommendation text\n* Remove IsUpgradeIssue from report file\n* Use new name for loading ObsoleteDatabase.json (ObsoleteDatabase.gen.json)\n* Fix Assembly/Area selection window disappearing when docked as a tab and another tab is selected or closed (UUM-142406)\n* Ensure all AnimationClip assets are detected and analyzed"
+    "changelog": "### Fixed\n* Internal change to improve compatability with the Project Auditor Rules package"
   },
   "upmCi": {
-    "footprint": "193dbac3a914e20d3c356f36379d3bf7dacd1f70"
+    "footprint": "8b58ef3d38e75d247e557aa7bd2f1ffd40eb7cbd"
   },
   "documentationUrl": "https://docs.unity3d.com/Packages/com.unity.project-auditor@3.0/manual/index.html",
   "repository": {
     "url": "https://github.cds.internal.unity3d.com/unity/ProjectAuditor.git",
     "type": "git",
-    "revision": "4334361571f1df777a4c036941d0746b525ee04d"
+    "revision": "f85dde83ccbe061fb0ce69482bb17963dbf57042"
   }
 }
