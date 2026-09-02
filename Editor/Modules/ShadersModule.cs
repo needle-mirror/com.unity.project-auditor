@@ -365,7 +365,11 @@ namespace Unity.ProjectAuditor.Editor.Modules
             buildReportInfoAvailable = packetAssetInfos.Length > 0;
 
             var sortedShaders = shaderPathMap.Keys.ToList().OrderBy(shader => shader.name);
+
             var analyzers = GetCompatibleAnalyzers(analysisParams);
+            foreach (var analyzer in analyzers)
+                analyzer.OnAnalysisStarted();
+
             foreach (var shader in sortedShaders)
             {
                 var assetPath = shaderPathMap[shader];

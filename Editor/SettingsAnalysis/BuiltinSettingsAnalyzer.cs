@@ -8,6 +8,7 @@ using UnityEngine;
 
 namespace Unity.ProjectAuditor.Editor.SettingsAnalysis
 {
+    [MigratedToRulesPackage(3)]
     class BuiltinSettingsAnalyzer : SettingsModuleAnalyzer
     {
         readonly List<Assembly> m_Assemblies = new List<Assembly>();
