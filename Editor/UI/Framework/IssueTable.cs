@@ -110,7 +110,8 @@ namespace Unity.ProjectAuditor.Editor.UI.Framework
             multicolumnHeader.sortingChanged += OnSortingChanged;
             showAlternatingRowBackgrounds = true;
 
-            Clear();
+            // Reset without clearing the selection
+            ResetIssues();
         }
 
         public void AddIssues(IReadOnlyCollection<ReportItem> issues)
@@ -155,10 +156,15 @@ namespace Unity.ProjectAuditor.Editor.UI.Framework
 
         public void Clear()
         {
+            ResetIssues();
+            ClearSelection();
+        }
+
+        void ResetIssues()
+        {
             m_NextId = k_FirstId;
             m_TreeViewItemGroupsLookup.Clear();
             m_TreeViewItemIssues = new Dictionary<int, IssueTableItem>();
-            ClearSelection();
         }
 
         protected override TreeViewItem BuildRoot()

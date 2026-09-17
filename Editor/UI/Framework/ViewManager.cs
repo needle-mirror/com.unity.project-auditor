@@ -2,14 +2,27 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.ProjectAuditor.Editor.Core;
+using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 using UnityEngine.Profiling;
+
+#if UNITY_6000_2_OR_NEWER
+using TreeViewState = UnityEditor.IMGUI.Controls.TreeViewState<int>;
+#endif
 
 namespace Unity.ProjectAuditor.Editor.UI.Framework
 {
     [Serializable]
     internal sealed class ViewManager
     {
+        // Persists each view's IssueTable expansion/selection state across domain reloads.
+        [Serializable]
+        class PersistedTreeViewState
+        {
+            public IssueCategory Category;
+            public TreeViewState State;
+        }
+
         class NullFilter : IIssueFilter
         {
             public bool Match(ReportItem issue)
@@ -28,6 +41,7 @@ namespace Unity.ProjectAuditor.Editor.UI.Framework
 
         [SerializeField] IssueCategory[] m_Categories;
         [SerializeField] int m_ActiveViewIndex;
+        [SerializeField] List<PersistedTreeViewState> m_TreeViewStates = new List<PersistedTreeViewState>();
 
         public Report Report => m_Report;
 
@@ -111,13 +125,24 @@ namespace Unity.ProjectAuditor.Editor.UI.Framework
                 }
 
                 var view = desc.Type != null ? (AnalysisView)Activator.CreateInstance(desc.Type, this) : new AnalysisView(this);
-                view.Create(desc, layout, rules, viewStates, filter);
+                view.Create(desc, layout, rules, viewStates, filter, GetOrCreateTreeViewState(category));
                 view.OnEnable();
                 views.Add(view);
             }
 
             m_Views = views.ToArray();
             Profiler.EndSample();
+        }
+
+        TreeViewState GetOrCreateTreeViewState(IssueCategory category)
+        {
+            var persisted = m_TreeViewStates.Find(s => s.Category == category);
+            if (persisted != null)
+                return persisted.State;
+
+            var state = new TreeViewState();
+            m_TreeViewStates.Add(new PersistedTreeViewState { Category = category, State = state });
+            return state;
         }
 
         public void ClearView(IssueCategory category)

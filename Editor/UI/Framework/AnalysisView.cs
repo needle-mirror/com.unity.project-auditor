@@ -33,7 +33,7 @@ namespace Unity.ProjectAuditor.Editor.UI.Framework
         protected IIssueFilter m_BaseFilter;
         protected List<ReportItem> m_Issues = new List<ReportItem>();
         protected IssueLayout m_Layout;
-        protected IssueTable m_Table;
+        protected internal IssueTable m_Table;
         protected TextFilter m_TextFilter;
         protected ViewManager m_ViewManager;
 
@@ -83,7 +83,7 @@ namespace Unity.ProjectAuditor.Editor.UI.Framework
             m_ViewManager = viewManager;
         }
 
-        public virtual void Create(ViewDescriptor descriptor, IssueLayout layout, SeverityRules rules, ViewStates viewStates, IIssueFilter filter)
+        public virtual void Create(ViewDescriptor descriptor, IssueLayout layout, SeverityRules rules, ViewStates viewStates, IIssueFilter filter, TreeViewState treeViewState)
         {
             m_Desc = descriptor;
             m_Rules = rules;
@@ -105,7 +105,7 @@ namespace Unity.ProjectAuditor.Editor.UI.Framework
             if (m_Table != null)
                 return;
 
-            var state = new TreeViewState();
+            var state = treeViewState ?? new TreeViewState();
             var columns = new MultiColumnHeaderState.Column[layout.Properties.Length];
             for (var i = 0; i < layout.Properties.Length; i++)
             {

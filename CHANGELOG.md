@@ -4,6 +4,12 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [3.1.0] - 2026-09-17
+
+### Fixed
+* Improve the Obsolete attribute analyzer to ensure it detects everything from the obsolete database file.
+* Preserve UI selections across Domain Reloads.
+
 ## [3.0.3] - 2026-09-02
 
 ### Added

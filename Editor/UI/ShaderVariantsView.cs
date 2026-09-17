@@ -7,8 +7,13 @@ using Unity.ProjectAuditor.Editor.UI.Framework;
 using Unity.ProjectAuditor.Editor.Modules;
 using Unity.ProjectAuditor.Editor.Utils;
 using UnityEditor;
+using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 using UnityEngine.Rendering;
+
+#if UNITY_6000_2_OR_NEWER
+using TreeViewState = UnityEditor.IMGUI.Controls.TreeViewState<int>;
+#endif
 
 namespace Unity.ProjectAuditor.Editor.UI
 {
@@ -68,7 +73,7 @@ namespace Unity.ProjectAuditor.Editor.UI
 
         PropertyFoldout[] m_PropertyFoldouts;
 
-        public override void Create(ViewDescriptor descriptor, IssueLayout layout, SeverityRules rules, ViewStates viewStates, IIssueFilter filter)
+        public override void Create(ViewDescriptor descriptor, IssueLayout layout, SeverityRules rules, ViewStates viewStates, IIssueFilter filter, TreeViewState treeViewState)
         {
             var propertyFoldouts = new List<PropertyFoldout>();
 
@@ -94,7 +99,7 @@ namespace Unity.ProjectAuditor.Editor.UI
                 });
             m_PropertyFoldouts = propertyFoldouts.ToArray();
 
-            base.Create(descriptor, layout, rules, viewStates, filter);
+            base.Create(descriptor, layout, rules, viewStates, filter, treeViewState);
         }
 
         void ParsePlayerLog(string logFilename)
