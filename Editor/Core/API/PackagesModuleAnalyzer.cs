@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.ProjectAuditor.Editor.Modules;
 using UnityEditor.PackageManager;
 
 namespace Unity.ProjectAuditor.Editor.Core
@@ -12,6 +13,11 @@ namespace Unity.ProjectAuditor.Editor.Core
         /// Information about a Unity package to be analyzed.
         /// </summary>
         public PackageInfo PackageInfo;
+
+        /// <summary>
+        /// The database describing packages shipped with (and removed from) each upgradeable Unity version.
+        /// </summary>
+        public PackageManifestDatabase ManifestDatabase;
     }
 
     /// <summary>

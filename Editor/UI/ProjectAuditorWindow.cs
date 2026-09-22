@@ -125,6 +125,26 @@ namespace Unity.ProjectAuditor.Editor.UI
             }
         }
 
+        static AddRequest PackageUpdateRequest;
+
+        static void PackageUpdateProgressCallback()
+        {
+            var wnd = GetWindow(typeof(ProjectAuditorWindow)) as ProjectAuditorWindow;
+            if (wnd != null)
+                wnd.Repaint();
+
+            if (PackageUpdateRequest.IsCompleted)
+            {
+                if (PackageUpdateRequest.Status == StatusCode.Success)
+                    Debug.Log("Installed: " + PackageUpdateRequest.Result.packageId);
+                else if (PackageUpdateRequest.Status >= StatusCode.Failure)
+                    Debug.Log(PackageUpdateRequest.Error.message);
+
+                EditorApplication.update -= PackageUpdateProgressCallback;
+                PackageUpdateRequest = null;
+            }
+        }
+
         private static Tab[] GetDefaultTabs()
         {
             Tab[] tabs = {
@@ -1539,7 +1559,7 @@ namespace Unity.ProjectAuditor.Editor.UI
                         }
 
                         // Analyze button
-                        using (new EditorGUI.DisabledScope((m_AnalysisState == AnalysisState.InProgress) || (ProjectAuditorRulesPackage.IsInstalled == false) || (RulesPackageInstallRequest != null)))
+                        using (new EditorGUI.DisabledScope((m_AnalysisState == AnalysisState.InProgress) || (ProjectAuditorRulesPackage.IsInstalled == false) || (RulesPackageInstallRequest != null) || (PackageUpdateRequest != null)))
                         {
                             var content = ProjectAuditorRulesPackage.IsInstalled ? Contents.AnalyzeButton : Contents.AnalyzeButtonDisabled;
                             if (GUILayout.Button(content, GUILayout.Width(k_ButtonWidth), GUILayout.Height(30)))
@@ -1565,28 +1585,57 @@ namespace Unity.ProjectAuditor.Editor.UI
                             }
                         }
 
-                        // Install rules
-                        using (new EditorGUI.DisabledScope((m_AnalysisState == AnalysisState.InProgress) || (ProjectAuditorRulesPackage.IsLatest) || (RulesPackageInstallRequest != null)))
+                        // Install rules / update package / update rules
                         {
-                            var content = Contents.InstallRulesButton;
-                            if (RulesPackageInstallRequest != null)
-                            {
-                                int frame = Utility.GetStatusWheelFrame();
-                                content = Contents.UpdateRulesButtonInProgress[frame];
-                            }
-                            else if (ProjectAuditorRulesPackage.IsLatest)
-                            {
-                                content = Contents.UpdateRulesButtonDisabled;
-                            }
-                            else if (ProjectAuditorRulesPackage.IsInstalled)
-                            {
-                                content = Contents.UpdateRulesButton;
-                            }
+                            var needsInstallRules = !ProjectAuditorRulesPackage.IsInstalled;
+                            var needsPackageUpdate = !needsInstallRules && !ProjectAuditorPackage.IsLatest;
+                            var needsRulesUpdate = !needsInstallRules && !needsPackageUpdate && !ProjectAuditorRulesPackage.IsLatest;
+                            var upToDate = !needsInstallRules && !needsPackageUpdate && !needsRulesUpdate;
 
-                            if (GUILayout.Button(content, GUILayout.Width(k_ButtonWidth), GUILayout.Height(30)))
+                            using (new EditorGUI.DisabledScope((m_AnalysisState == AnalysisState.InProgress) || upToDate ||
+                                (RulesPackageInstallRequest != null) || (PackageUpdateRequest != null)))
                             {
-                                RulesPackageInstallRequest = Client.Add(ProjectAuditorRulesPackage.Name);
-                                EditorApplication.update += RulesPackageInstallProgressCallback;
+                                GUIContent content;
+                                if (RulesPackageInstallRequest != null)
+                                {
+                                    int frame = Utility.GetStatusWheelFrame();
+                                    content = Contents.UpdateRulesButtonInProgress[frame];
+                                }
+                                else if (PackageUpdateRequest != null)
+                                {
+                                    int frame = Utility.GetStatusWheelFrame();
+                                    content = Contents.UpdatePackageButtonInProgress[frame];
+                                }
+                                else if (needsInstallRules)
+                                {
+                                    content = Contents.InstallRulesButton;
+                                }
+                                else if (needsPackageUpdate)
+                                {
+                                    content = Contents.UpdatePackageButton;
+                                }
+                                else if (needsRulesUpdate)
+                                {
+                                    content = Contents.UpdateRulesButton;
+                                }
+                                else
+                                {
+                                    content = Contents.UpdateRulesButtonDisabled;
+                                }
+
+                                if (GUILayout.Button(content, GUILayout.Width(k_ButtonWidth), GUILayout.Height(30)))
+                                {
+                                    if (needsPackageUpdate)
+                                    {
+                                        PackageUpdateRequest = Client.Add(ProjectAuditorPackage.Name);
+                                        EditorApplication.update += PackageUpdateProgressCallback;
+                                    }
+                                    else
+                                    {
+                                        RulesPackageInstallRequest = Client.Add(ProjectAuditorRulesPackage.Name);
+                                        EditorApplication.update += RulesPackageInstallProgressCallback;
+                                    }
+                                }
                             }
                         }
 
@@ -2323,11 +2372,14 @@ namespace Unity.ProjectAuditor.Editor.UI
 
             public static readonly GUIContent InstallRulesButton =
                 new GUIContent("Install Rules", $"Please install the rules package to analyze your project ({ProjectAuditorRulesPackage.Name}).");
+            public static readonly GUIContent UpdatePackageButton =
+                new GUIContent("Update Package", $"Please update Project Auditor to the latest version ({ProjectAuditorPackage.Name}@{ProjectAuditorPackage.LatestVersion}).");
             public static readonly GUIContent UpdateRulesButton =
                 new GUIContent("Update Rules", $"Please update your rules package to the latest version ({ProjectAuditorRulesPackage.Name}@{ProjectAuditorRulesPackage.LatestVersion}).");
             public static readonly GUIContent UpdateRulesButtonDisabled =
                 new GUIContent("Update Rules", "Everything is up to date!");
             public static readonly GUIContent[] UpdateRulesButtonInProgress;
+            public static readonly GUIContent[] UpdatePackageButtonInProgress;
 
             public static readonly GUIContent SaveButton = Utility.GetIcon(Utility.IconType.Save, "Save current report to projectauditor file");
             public static readonly GUIContent LoadButton = Utility.GetIcon(Utility.IconType.Load, "Load report from projectauditor file");
@@ -2386,8 +2438,12 @@ namespace Unity.ProjectAuditor.Editor.UI
             static Contents()
             {
                 UpdateRulesButtonInProgress = new GUIContent[12];
+                UpdatePackageButtonInProgress = new GUIContent[12];
                 for (int i = 0; i < 12; i++)
+                {
                     UpdateRulesButtonInProgress[i] = EditorGUIUtility.TrTextContentWithIcon(" Installing Rules...", "WaitSpin" + i.ToString("00"));
+                    UpdatePackageButtonInProgress[i] = EditorGUIUtility.TrTextContentWithIcon(" Updating Package...", "WaitSpin" + i.ToString("00"));
+                }
             }
         }
     }

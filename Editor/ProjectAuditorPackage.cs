@@ -24,6 +24,9 @@ namespace Unity.ProjectAuditor.Editor
             Version = packageInfo.version;
             var splitVersion = packageInfo.version.Split('.');
             VersionShort = splitVersion[0] + '.' + splitVersion[1];
+
+            LatestVersion = packageInfo.versions?.latest;
+            IsLatest = string.IsNullOrEmpty(LatestVersion) || PackageUtils.CompareVersions(LatestVersion, packageInfo.version) <= 0;
         }
 
         public static bool IsLocal { get; }
@@ -35,5 +38,9 @@ namespace Unity.ProjectAuditor.Editor
         public static string Version { get; }
 
         public static string VersionShort { get; }
+
+        public static string LatestVersion { get; }
+
+        public static bool IsLatest { get; }
     }
 }

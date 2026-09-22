@@ -28,8 +28,8 @@ namespace Unity.ProjectAuditor.Editor
             IsInstalled = (packageInfo != null);
             if (IsInstalled)
             {
-                LatestVersion = packageInfo.versions.latest;
-                IsLatest = LatestVersion == packageInfo.version;
+                LatestVersion = packageInfo.versions?.latest;
+                IsLatest = string.IsNullOrEmpty(LatestVersion) || PackageUtils.CompareVersions(LatestVersion, packageInfo.version) <= 0;
                 IsLocal = packageInfo.source == PackageSource.Local;
                 Version = packageInfo.version;
                 var splitVersion = packageInfo.version.Split('.');
